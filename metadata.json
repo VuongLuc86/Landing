@@ -1,0 +1,6 @@
+{
+  "name": "Điện 365 Đại lý chính thức của HUNONIC",
+  "description": "Điện 365 - Đại lý chính thức của HUNONIC. Hệ thống phân phối và bảo hành thiết bị nhà thông minh thuần Việt chính hãng trên toàn quốc",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

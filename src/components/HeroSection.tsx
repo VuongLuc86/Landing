@@ -118,10 +118,13 @@ export const HeroSection: React.FC<HeroProps> = ({ onOpenOrder, onOpenSimulator 
 
           <div className="relative w-full rounded-3xl overflow-hidden shadow-2xl bg-white border border-slate-200 group">
             <img
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0JOYXPQDCPpLc2e4QLXxGj45-G0X2fK2-n9soT34V2u99QAd4J0gnGvZMfXBF16fW8AlBU-cBasjs-Xgpp7rmsYyLM7d_U7I1RNbOPnDLZy1knscAIViC7Q66pmoQqVzzCwsT6hi87eI2xxrkrGT6jFdHRer9vCrPIQtxUf1q9QXZKG8b-f4S4Do03LiAcDz0vYPrPeOLgyA-V6te4cr7AG8RZ5xY_Qo7KJoeTzkpgT7en-6AngrE"
+              src="https://hunonic.com/wp-content/uploads/2022/11/nha-thong-minh-hunonic.jpg"
               alt="Không gian sống thông minh Hunonic sang trọng, sắc nét, hiện đại chuẩn Việt Nam"
               className="w-full h-auto object-cover aspect-square md:aspect-[4/3] group-hover:scale-105 transition-transform duration-700 ease-out"
               referrerPolicy="no-referrer"
+              onError={(e) => {
+                e.currentTarget.src = '/images/hunonic/nha-thong-minh-hunonic.jpg';
+              }}
             />
 
             {/* Overlapping Floating Card Top Left */}

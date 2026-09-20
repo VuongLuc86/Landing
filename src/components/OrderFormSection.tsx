@@ -1,32 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import { COMBOS_DATA, PRODUCTS_DATA } from '../data/mockData';
+import { COMBOS_DATA, PRODUCTS_DATA, PRODUCT_CATEGORIES } from '../data/mockData';
 import { ProductShape } from '../types';
-import { OrdersFileModal } from './OrdersFileModal';
-import { ViettelPostAddressVerifier } from './ViettelPostAddressVerifier';
-import { AddressMatchResult } from '../data/vietnamAddressData';
+import { useCart } from '../context/CartContext';
+import { VIETNAM_PROVINCES } from '../data/vietnamAddressData';
+import {
+  validateVietnamesePhoneNumber,
+  validateVietnameseAddress,
+} from '../utils/validationUtils';
 
 interface OrderFormProps {
   initialBundleId?: string;
-  initialCustomConfig?: { color: string; gangs: number; shape: string } | null;
+  onOpenQuickOrderModal?: (target?: any) => void;
+  onOpenOrdersFileModal?: () => void;
 }
 
 export const OrderFormSection: React.FC<OrderFormProps> = ({
-  initialBundleId = 'combo-5',
-  initialCustomConfig = null,
+  initialBundleId = 'switch-luxury',
+  onOpenQuickOrderModal,
+  onOpenOrdersFileModal,
 }) => {
+  const { customerProfile, saveCustomerProfile, addToCart, setIsCartOpen, setCheckoutStep } = useCart();
+
   const [selectedBundle, setSelectedBundle] = useState<string>(initialBundleId);
+  const [quantity, setQuantity] = useState<number>(1);
   const [shape, setShape] = useState<ProductShape>('rectangular');
+
+  // ONLY 3 CORE FIELDS: Họ tên, Số điện thoại, Địa chỉ nhận hàng
   const [fullName, setFullName] = useState<string>('');
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [address, setAddress] = useState<string>('');
-  const [notes, setNotes] = useState<string>('');
-  const [addressVerification, setAddressVerification] = useState<AddressMatchResult | null>(null);
+  
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [orderConfirmed, setOrderConfirmed] = useState<boolean>(false);
   const [orderCode, setOrderCode] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string>('');
-  const [isOrdersModalOpen, setIsOrdersModalOpen] = useState<boolean>(false);
-  const [lastUpdated, setLastUpdated] = useState<number>(Date.now());
+  const [copiedCode, setCopiedCode] = useState<boolean>(false);
+
+  // Autofill customer profile
+  useEffect(() => {
+    if (customerProfile.fullName && !fullName) setFullName(customerProfile.fullName);
+    if (customerProfile.phone && !phoneNumber) setPhoneNumber(customerProfile.phone);
+    if (customerProfile.address && !address) setAddress(customerProfile.address);
+  }, [customerProfile]);
 
   useEffect(() => {
     if (initialBundleId) {
@@ -34,65 +49,124 @@ export const OrderFormSection: React.FC<OrderFormProps> = ({
     }
   }, [initialBundleId]);
 
-  useEffect(() => {
-    if (initialCustomConfig) {
-      const configDetails: string[] = [];
-      if (initialCustomConfig.color) configDetails.push(`Màu: ${initialCustomConfig.color}`);
-      if (initialCustomConfig.gangs) configDetails.push(`${initialCustomConfig.gangs} Nút`);
-      if (initialCustomConfig.shape) configDetails.push(`Đế: ${initialCustomConfig.shape}`);
-      if (initialCustomConfig.quantity && initialCustomConfig.quantity > 1) {
-        configDetails.push(`SL: ${initialCustomConfig.quantity}`);
-      }
-      setNotes(
-        `Chọn mua: ${initialCustomConfig.product.name}${
-          configDetails.length > 0 ? ` [${configDetails.join(' | ')}]` : ''
-        }`
-      );
-      if (initialCustomConfig.shape?.includes('Vuông')) {
-        setShape('square');
-      }
-    }
-  }, [initialCustomConfig]);
-
   // Pricing calculation
-  const getBundleInfo = () => {
-    const combo = COMBOS_DATA.find((c) => c.id === selectedBundle);
-    if (combo) return { name: combo.name, price: combo.price, original: combo.originalPrice };
-
+  const getSelectedItem = () => {
     const product = PRODUCTS_DATA.find((p) => p.id === selectedBundle);
-    if (product) return { name: product.name, price: product.price, original: product.originalPrice };
+    if (product) {
+      return {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        originalPrice: product.originalPrice,
+        category: product.category,
+        image: product.imageUrl,
+        fallbackImage: product.fallbackImageUrl,
+        isProduct: true,
+      };
+    }
 
-    return { name: 'Combo 5 Thiết Bị', price: 1580000, original: 1980000 };
+    const combo = COMBOS_DATA.find((c) => c.id === selectedBundle);
+    if (combo) {
+      return {
+        id: combo.id,
+        name: combo.name,
+        price: combo.price,
+        originalPrice: combo.originalPrice,
+        category: 'Gói Combo',
+        image: '/images/hunonic/hunonic-cam-ung.jpg',
+        fallbackImage: '/images/hunonic/hunonic-cam-ung.jpg',
+        isProduct: false,
+      };
+    }
+
+    const defaultProduct = PRODUCTS_DATA[0];
+    return {
+      id: defaultProduct.id,
+      name: defaultProduct.name,
+      price: defaultProduct.price,
+      originalPrice: defaultProduct.originalPrice,
+      category: defaultProduct.category,
+      image: defaultProduct.imageUrl,
+      fallbackImage: defaultProduct.fallbackImageUrl,
+      isProduct: true,
+    };
   };
 
-  const currentInfo = getBundleInfo();
-  const discountAmount = Math.max(0, currentInfo.original - currentInfo.price);
+  const currentItem = getSelectedItem();
+  const totalPrice = currentItem.price * quantity;
+  const totalOriginalPrice = currentItem.originalPrice * quantity;
+  const totalSaved = Math.max(0, totalOriginalPrice - totalPrice);
+
+  const popularCities = ['Hà Nội', 'TP. Hồ Chí Minh', 'Đà Nẵng', 'Hải Phòng', 'Bình Dương', 'Cần Thơ'];
+
+  const handleQuickCity = (city: string) => {
+    if (!address) {
+      setAddress(`${city}, `);
+    } else if (!address.toLowerCase().includes(city.toLowerCase())) {
+      setAddress(`${address.trim()}, ${city}`);
+    }
+  };
+
+  const handleAddToCart = () => {
+    addToCart(
+      {
+        productId: currentItem.id,
+        name: currentItem.name,
+        category: currentItem.category,
+        price: currentItem.price,
+        originalPrice: currentItem.originalPrice,
+        imageUrl: currentItem.image,
+        shape: shape === 'rectangular' ? 'Đế Chữ nhật' : 'Đế Vuông',
+        quantity,
+      },
+      true
+    );
+  };
+
+  // Real-time validation checks
+  const phoneValidation = validateVietnamesePhoneNumber(phoneNumber);
+  const addressValidation = validateVietnameseAddress(address);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
 
     if (!fullName.trim()) {
-      setErrorMsg('Vui lòng nhập họ và tên.');
+      setErrorMsg('Vui lòng nhập họ và tên của bạn.');
       return;
     }
 
-    const cleanPhone = phoneNumber.replace(/[^0-9]/g, '');
-    if (cleanPhone.length < 9 || cleanPhone.length > 11) {
-      setErrorMsg('Vui lòng nhập số điện thoại hợp lệ (10 số).');
+    // Check authentic Vietnamese phone number
+    if (!phoneValidation.isValid) {
+      setErrorMsg(phoneValidation.message);
       return;
     }
 
-    if (!address.trim()) {
-      setErrorMsg('Vui lòng nhập địa chỉ nhận hàng để kỹ sư giao hàng.');
+    // Check deliverable address
+    if (!addressValidation.isDeliverable) {
+      setErrorMsg(addressValidation.message);
       return;
     }
 
     setIsSubmitting(true);
 
-    const fullNote = notes
-      ? `${notes} (Đế: ${shape === 'rectangular' ? 'Chữ nhật' : 'Vuông'})`
-      : `Đế: ${shape === 'rectangular' ? 'Chữ nhật' : 'Vuông'}`;
+    const cleanPhone = phoneValidation.cleanPhone;
+    const finalAddress = addressValidation.canonicalAddress || address.trim();
+
+    // Save profile for future zero-friction orders
+    saveCustomerProfile({
+      fullName: fullName.trim(),
+      phone: cleanPhone,
+      address: finalAddress,
+      province: addressValidation.province,
+      district: addressValidation.district,
+    });
+
+    const fullNoteParts = [
+      `Đế: ${shape === 'rectangular' ? 'Chữ nhật' : 'Vuông'}`,
+      'Thanh toán COD khi nhận hàng',
+      'Giá đã gồm VAT & Freeship',
+    ].filter(Boolean);
 
     const now = new Date();
     const day = String(now.getDate()).padStart(2, '0');
@@ -102,11 +176,11 @@ export const OrderFormSection: React.FC<OrderFormProps> = ({
 
     const payload = {
       fullName: fullName.trim(),
-      phone: phoneNumber.trim(),
+      phone: cleanPhone,
       address: address.trim(),
-      productName: currentInfo.name,
-      amount: currentInfo.price,
-      note: fullNote,
+      productName: `${currentItem.name} - SL: ${quantity}`,
+      amount: totalPrice,
+      note: fullNoteParts.join(' | '),
       orderDate: dateFormatted,
     };
 
@@ -121,24 +195,11 @@ export const OrderFormSection: React.FC<OrderFormProps> = ({
       console.warn('Lưu API thất bại, lưu fallback vào localStorage:', err);
     }
 
-    // Also update client-side storage cache for fallback resilience
+    // Save to client-side storage cache for fallback resilience
     try {
       const existing = localStorage.getItem('hunonic_orders_csv_records');
-      const ordersList = existing
-        ? JSON.parse(existing)
-        : [
-            {
-              stt: 1,
-              fullName: 'Vương Văn Lực',
-              phone: '966757585',
-              address: '253, Nguyễn Thị Duệ, phường Việt Hòa, tp Hải Phòng',
-              productName: 'Bộ Điều Khiển Hồng Ngoại IR',
-              orderDate: '16/09/2026',
-              amount: 295000,
-              note: 'test',
-            },
-          ];
-      const nextStt = ordersList.length > 0 ? Math.max(...ordersList.map((o: any) => o.stt)) + 1 : 1;
+      const ordersList = existing ? JSON.parse(existing) : [];
+      const nextStt = ordersList.length > 0 ? Math.max(...ordersList.map((o: any) => o.stt || 0)) + 1 : 1;
       ordersList.push({
         stt: nextStt,
         fullName: payload.fullName,
@@ -158,492 +219,474 @@ export const OrderFormSection: React.FC<OrderFormProps> = ({
     const code = `HN-${Math.floor(100000 + Math.random() * 900000)}`;
     setOrderCode(code);
     setOrderConfirmed(true);
-    setLastUpdated(Date.now());
+  };
+
+  const copyCode = () => {
+    navigator.clipboard.writeText(orderCode);
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2000);
   };
 
   return (
-    <section className="w-full py-16 lg:py-24 bg-white" id="dat-hang">
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 flex flex-col gap-12">
-        {/* Section Header */}
-        <div className="flex flex-col items-center text-center gap-3 max-w-3xl mx-auto">
+    <section className="w-full py-14 lg:py-20 bg-slate-50 border-t border-slate-200" id="dat-hang">
+      <div className="max-w-[1100px] mx-auto px-4 sm:px-6 flex flex-col gap-8">
+        {/* Section Header - Clean & Simple */}
+        <div className="flex flex-col items-center text-center gap-2.5 max-w-2xl mx-auto">
           <div className="flex flex-wrap items-center justify-center gap-2">
-            <span className="text-xs sm:text-sm text-blue-700 uppercase tracking-widest font-extrabold bg-blue-50 px-3.5 py-1 rounded-full border border-blue-200">
-              Điện 365 • Đại Lý Chính Thức Của HUNONIC
+            <span className="text-xs text-blue-700 uppercase tracking-widest font-extrabold bg-blue-50 px-3 py-0.5 rounded-full border border-blue-200">
+              Điện 365 • Đại Lý Chính Thức HUNONIC
             </span>
             <span className="text-slate-300">•</span>
-            <a
-              href="tel:0877999663"
-              className="text-xs sm:text-sm text-blue-800 font-bold hover:underline inline-flex items-center gap-1"
-            >
-              <span className="material-symbols-outlined text-[16px] text-blue-600">call</span>
-              Hotline: 0877.999.663
-            </a>
+            <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1">
+              <span className="material-symbols-outlined text-[13px]">verified</span>
+              Đã gồm 100% thuế VAT & Miễn phí vận chuyển
+            </span>
           </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-heading text-slate-900 leading-tight">
-            Đặt Hàng Trực Tiếp & Điền Đầy Đủ Thông Tin Vào File
+
+          <h2 className="text-2xl sm:text-3xl font-bold font-heading text-slate-900 leading-tight">
+            Đặt Hàng Nhanh — Giao Tận Nơi Toàn Quốc
           </h2>
-          <p className="text-sm sm:text-base text-slate-600">
-            Hệ thống Điện 365 ghi nhận tự động và đối soát trực tiếp vào file dữ liệu đơn hàng chuẩn ({' '}
-            <strong className="text-slate-800">STT, Họ tên, SĐT, Địa chỉ, Sản phẩm mua, Ngày tháng năm, Số tiền thanh toán, Ghi chú</strong>
-            {' '}) kết nối chuẩn hóa địa chỉ Viettel Post và kiểm tra hàng trước khi thanh toán.
+          <p className="text-xs sm:text-sm text-slate-600">
+            Form tinh gọn chỉ 3 thông tin cốt lõi (Họ tên, Số điện thoại, Địa chỉ nhận hàng). Nhận hàng kiểm tra thử trước khi thanh toán (COD).
           </p>
 
-          <div className="pt-1 flex flex-wrap items-center justify-center gap-2">
+          <div className="pt-1 flex flex-wrap items-center justify-center gap-2.5">
             <button
-              onClick={() => setIsOrdersModalOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 text-xs font-bold border border-blue-200 shadow-xs transition-colors cursor-pointer"
+              type="button"
+              onClick={() => {
+                setCheckoutStep('cart');
+                setIsCartOpen(true);
+              }}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold shadow-md transition-all cursor-pointer"
             >
-              <span className="material-symbols-outlined text-[18px] text-blue-700">description</span>
-              <span>Xem File Dữ Liệu Đơn Hàng (orders.csv)</span>
+              <span className="material-symbols-outlined text-[16px] text-amber-400">shopping_bag</span>
+              <span>Mở Popup Giỏ Hàng Mini</span>
             </button>
-            <span className="text-xs text-slate-400">
-              (Đã có đơn mẫu khách hàng Vương Văn Lực)
-            </span>
+
+            {onOpenOrdersFileModal && (
+              <button
+                type="button"
+                onClick={onOpenOrdersFileModal}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 text-blue-800 text-xs font-bold border border-slate-300 shadow-2xs transition-colors cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[16px] text-blue-700">description</span>
+                <span>Xem File Đơn Hàng (orders.csv)</span>
+              </button>
+            )}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Order Form Card (Left Column) */}
-          <div className="lg:col-span-7 bg-[#f7f9fb] p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-lg">
-            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        {orderConfirmed ? (
+          /* Confirmation Success State */
+          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-emerald-200 shadow-md text-center max-w-xl mx-auto flex flex-col items-center gap-4 animate-fadeIn">
+            <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center">
+              <span className="material-symbols-outlined text-[36px]">check_circle</span>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-bold font-heading text-slate-900">
+              ĐẶT HÀNG THÀNH CÔNG!
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600">
+              Cảm ơn anh/chị <strong>{fullName}</strong>. Mã đơn hàng của anh/chị là{' '}
+              <strong className="text-blue-700 font-mono text-base">{orderCode}</strong>.
+            </p>
+
+            <button
+              type="button"
+              onClick={copyCode}
+              className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[15px]">{copiedCode ? 'check' : 'content_copy'}</span>
+              <span>{copiedCode ? 'Đã sao chép mã' : 'Sao chép mã đơn'}</span>
+            </button>
+
+            <div className="w-full bg-slate-50 p-4 rounded-2xl border border-slate-200 text-left text-xs text-slate-700 flex flex-col gap-2">
+              <div className="flex justify-between py-1 border-b border-slate-200">
+                <span className="text-slate-500">Mặt hàng:</span>
+                <span className="font-bold text-right text-slate-900">{currentItem.name}</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-slate-200">
+                <span className="text-slate-500">Số lượng:</span>
+                <span className="font-bold">{quantity} thiết bị</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-slate-200">
+                <span className="text-slate-500">Địa chỉ giao:</span>
+                <span className="font-medium text-right">{address}</span>
+              </div>
+              <div className="flex justify-between py-1 text-sm font-bold text-slate-900">
+                <span>Tổng tiền (Đã gồm VAT & Freeship):</span>
+                <span className="text-base text-[#e04b16] font-black font-heading">
+                  {totalPrice.toLocaleString('vi-VN')} đ
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2 justify-center pt-2">
+              <button
+                type="button"
+                onClick={() => setOrderConfirmed(false)}
+                className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-colors cursor-pointer"
+              >
+                Đặt Thêm Đơn Khác
+              </button>
+              {onOpenOrdersFileModal && (
+                <button
+                  type="button"
+                  onClick={onOpenOrdersFileModal}
+                  className="px-4 py-2.5 rounded-xl bg-blue-50 text-blue-800 text-xs font-bold border border-blue-200 hover:bg-blue-100 transition-colors cursor-pointer flex items-center gap-1"
+                >
+                  <span className="material-symbols-outlined text-[15px]">description</span>
+                  <span>Kiểm Tra File orders.csv</span>
+                </button>
+              )}
+            </div>
+          </div>
+        ) : (
+          /* Streamlined Order Card */
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-md p-5 sm:p-8 max-w-4xl mx-auto w-full">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
               {errorMsg && (
-                <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[20px]">error</span>
+                <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-medium flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[18px]">error</span>
                   <span>{errorMsg}</span>
                 </div>
               )}
 
-              {/* File Data Mapping Notice */}
-              <div className="p-4 bg-blue-50/80 border border-blue-200/90 rounded-2xl flex flex-col gap-2 text-xs">
-                <div className="flex items-center justify-between font-bold">
-                  <span className="flex items-center gap-1.5 text-blue-900">
-                    <span className="material-symbols-outlined text-[18px] text-blue-700">table_chart</span>
-                    <span>Quy chuẩn 8 cột dữ liệu khách hàng lưu vào file (orders.csv):</span>
+              {/* Autofill indicator */}
+              {customerProfile.fullName && (
+                <div className="p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-xs font-semibold flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-[16px] text-blue-700">auto_fix_high</span>
+                    <span>Tự động điền trước thông tin từ lần ghé thăm trước</span>
                   </span>
-                  <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-300">
-                    Chuẩn 100%
-                  </span>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] text-slate-700 pt-1">
-                  <div className="bg-white p-2 rounded-xl border border-blue-100/80 shadow-2xs">
-                    <span className="block font-bold text-blue-900">1. STT</span>
-                    <span className="text-slate-500 text-[10px]">Tự động tăng dần</span>
-                  </div>
-                  <div className="bg-white p-2 rounded-xl border border-blue-100/80 shadow-2xs">
-                    <span className="block font-bold text-blue-900">2. Họ tên</span>
-                    <span className="text-slate-500 text-[10px]">Khách hàng điền</span>
-                  </div>
-                  <div className="bg-white p-2 rounded-xl border border-blue-100/80 shadow-2xs">
-                    <span className="block font-bold text-blue-900">3. SĐT</span>
-                    <span className="text-slate-500 text-[10px]">Số điện thoại liên hệ</span>
-                  </div>
-                  <div className="bg-white p-2 rounded-xl border border-blue-100/80 shadow-2xs">
-                    <span className="block font-bold text-blue-900">4. Địa chỉ</span>
-                    <span className="text-slate-500 text-[10px]">Số nhà, xã/phường, tỉnh</span>
-                  </div>
-                  <div className="bg-white p-2 rounded-xl border border-blue-100/80 shadow-2xs">
-                    <span className="block font-bold text-blue-900">5. Sản phẩm mua</span>
-                    <span className="text-slate-500 text-[10px]">Thiết bị/Gói đặt mua</span>
-                  </div>
-                  <div className="bg-white p-2 rounded-xl border border-blue-100/80 shadow-2xs">
-                    <span className="block font-bold text-blue-900">6. Ngày tháng năm</span>
-                    <span className="text-slate-500 text-[10px]">Định dạng DD/MM/YYYY</span>
-                  </div>
-                  <div className="bg-white p-2 rounded-xl border border-blue-100/80 shadow-2xs">
-                    <span className="block font-bold text-blue-900">7. Số tiền thanh toán</span>
-                    <span className="text-slate-500 text-[10px]">Tính bằng VNĐ</span>
-                  </div>
-                  <div className="bg-white p-2 rounded-xl border border-blue-100/80 shadow-2xs">
-                    <span className="block font-bold text-blue-900">8. Ghi chú</span>
-                    <span className="text-slate-500 text-[10px]">Đế âm, màu, chi tiết</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Package Selector */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                  1. Sản phẩm mua (Cột 5 trong file) *
-                </label>
-                <select
-                  value={selectedBundle}
-                  onChange={(e) => setSelectedBundle(e.target.value)}
-                  className="w-full px-4 py-3.5 rounded-xl bg-white border border-slate-300 text-slate-900 font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-xs"
-                >
-                  <optgroup label="Gói Combo Ưu Đãi (Khuyên Dùng)">
-                    {COMBOS_DATA.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name} — {c.price > 0 ? `${c.price.toLocaleString('vi-VN')}đ` : 'Miễn Phí Tư Vấn'} ({c.discountText})
-                      </option>
-                    ))}
-                  </optgroup>
-                  <optgroup label="Sản Phẩm Lẻ">
-                    {PRODUCTS_DATA.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name} — {p.price.toLocaleString('vi-VN')}đ (-{p.discountPercent}%)
-                      </option>
-                    ))}
-                  </optgroup>
-                </select>
-              </div>
-
-              {/* Shape Selector */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                  2. Chuẩn hộp đế âm tường (Ghi nhận vào Cột 8 - Ghi chú)
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <button
                     type="button"
-                    onClick={() => setShape('rectangular')}
-                    className={`p-3.5 rounded-xl text-left border transition-all flex items-center gap-3 cursor-pointer ${
-                      shape === 'rectangular'
-                        ? 'bg-blue-50 border-blue-600 text-blue-900 font-bold ring-2 ring-blue-500/20'
-                        : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
-                    }`}
+                    onClick={() => {
+                      setFullName('');
+                      setPhoneNumber('');
+                      setAddress('');
+                    }}
+                    className="text-blue-600 hover:underline text-[11px] cursor-pointer"
                   >
-                    <span className="w-8 h-5 border-2 border-slate-400 rounded-xs shrink-0" />
-                    <div>
-                      <span className="text-xs sm:text-sm font-bold block">Chữ Nhật (120x72mm)</span>
-                      <span className="text-[11px] text-slate-500">Phổ biến Sino, Panasonic</span>
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setShape('square')}
-                    className={`p-3.5 rounded-xl text-left border transition-all flex items-center gap-3 cursor-pointer ${
-                      shape === 'square'
-                        ? 'bg-blue-50 border-blue-600 text-blue-900 font-bold ring-2 ring-blue-500/20'
-                        : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
-                    }`}
-                  >
-                    <span className="w-6 h-6 border-2 border-slate-400 rounded-xs shrink-0" />
-                    <div>
-                      <span className="text-xs sm:text-sm font-bold block">Vuông (86x86mm)</span>
-                      <span className="text-[11px] text-slate-500">Schneider, Chuẩn EU</span>
-                    </div>
+                    Điền mới
                   </button>
                 </div>
-              </div>
+              )}
 
-              {/* Contact Inputs */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    3. Họ và tên (Cột 2 trong file) *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Ví dụ: Vương Văn Lực"
-                    className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-xs"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    4. Số điện thoại nhận hàng (Cột 3 trong file) *
-                  </label>
-                  <input
-                    type="tel"
-                    required
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    placeholder="Ví dụ: 0966 757 585"
-                    className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-xs"
-                  />
-                </div>
-              </div>
-
-              {/* Address with Google Maps and Viettel Post matching */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  5. Địa chỉ nhận hàng (Cột 4 trong file) *
-                </label>
-                <ViettelPostAddressVerifier
-                  value={address}
-                  onChange={setAddress}
-                  onVerificationChange={setAddressVerification}
-                />
-              </div>
-
-              {/* Auto columns preview: Date and Amount */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-slate-100/80 rounded-xl border border-slate-200 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-600 font-semibold">6. Ngày tháng năm (Cột 6):</span>
-                  <span className="font-mono font-bold text-blue-900 bg-white px-2.5 py-1 rounded border border-slate-200">
-                    {new Date().toLocaleDateString('vi-VN')}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-600 font-semibold">7. Số tiền thanh toán (Cột 7):</span>
-                  <span className="font-mono font-black text-[#e04b16] bg-white px-2.5 py-1 rounded border border-slate-200">
-                    {currentInfo.price.toLocaleString('vi-VN')}đ
-                  </span>
-                </div>
-              </div>
-
-              {/* Notes */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  8. Ghi chú đơn hàng (Cột 8 trong file)
-                </label>
-                <textarea
-                  rows={2}
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi giao, test thiết bị..."
-                  className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-xs"
-                />
-              </div>
-
-              {/* Submit CTA Button */}
-              <div className="pt-2">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-4 px-6 rounded-xl text-white font-bold text-base btn-cta-action shadow-xl flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-70"
-                >
-                  {isSubmitting ? (
-                    <span className="flex items-center gap-2">
-                      <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Đang xử lý đơn hàng...
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+                {/* Left Column: Product selection & Pricing Breakdown */}
+                <div className="md:col-span-5 flex flex-col gap-4 bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-900 uppercase">
+                      1. Chọn Thiết Bị Cần Mua:
                     </span>
-                  ) : (
-                    <>
-                      <span className="material-symbols-outlined text-[22px]">local_shipping</span>
-                      <span>XÁC NHẬN ĐẶT HÀNG — SHIP COD TOÀN QUỐC</span>
-                    </>
-                  )}
-                </button>
-              </div>
+                  </div>
 
-              <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-500 pt-1">
-                <span className="flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[16px] text-emerald-600">verified</span>
-                  Kiểm tra trước khi trả tiền
-                </span>
-                <span>•</span>
-                <span className="flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[16px] text-emerald-600">cached</span>
-                  1 đổi 1 trong 30 ngày
-                </span>
-                <span>•</span>
-                <span className="flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[16px] text-emerald-600">shield</span>
-                  Bảo hành 24 tháng
-                </span>
+                  <select
+                    value={selectedBundle}
+                    onChange={(e) => setSelectedBundle(e.target.value)}
+                    className="w-full text-xs font-semibold text-slate-900 bg-white border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+                  >
+                    {PRODUCT_CATEGORIES.filter((c) => c.id !== 'tat-ca').map((cat) => {
+                      const catProducts = PRODUCTS_DATA.filter((p) => p.categorySlug === cat.id);
+                      if (catProducts.length === 0) return null;
+                      return (
+                        <optgroup key={cat.id} label={`── ${cat.name} (${catProducts.length}) ──`}>
+                          {catProducts.map((p) => (
+                            <option key={p.id} value={p.id}>
+                              {p.name} — {p.price.toLocaleString('vi-VN')}đ (Đã gồm VAT)
+                            </option>
+                          ))}
+                        </optgroup>
+                      );
+                    })}
+                    <optgroup label="── Gói Combo Trọn Gói Tiết Kiệm ──">
+                      {COMBOS_DATA.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name} — {c.price.toLocaleString('vi-VN')}đ (Đã gồm VAT)
+                        </option>
+                      ))}
+                    </optgroup>
+                  </select>
+
+                  {/* Quantity Stepper */}
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-xs font-bold text-slate-700">
+                      Số lượng cần mua:
+                    </span>
+                    <div className="flex items-center border border-slate-300 rounded-xl bg-white overflow-hidden shadow-2xs">
+                      <button
+                        type="button"
+                        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                        disabled={quantity <= 1}
+                        className="w-8 h-8 flex items-center justify-center text-slate-600 hover:bg-slate-100 disabled:opacity-30 cursor-pointer"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">remove</span>
+                      </button>
+                      <span className="w-10 text-center text-xs font-bold text-slate-900">
+                        {quantity}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setQuantity((q) => q + 1)}
+                        className="w-8 h-8 flex items-center justify-center text-slate-600 hover:bg-slate-100 cursor-pointer"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">add</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Đế âm tường (nếu là công tắc/ổ cắm) */}
+                  <div className="pt-2 border-t border-slate-200">
+                    <span className="block text-xs font-bold text-slate-700 mb-1.5">
+                      Chuẩn đế âm tường:
+                    </span>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => setShape('rectangular')}
+                        className={`py-1.5 px-2 rounded-xl font-bold text-[11px] cursor-pointer ${
+                          shape === 'rectangular'
+                            ? 'bg-blue-700 text-white'
+                            : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
+                        }`}
+                      >
+                        Chữ nhật (Sino)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShape('square')}
+                        className={`py-1.5 px-2 rounded-xl font-bold text-[11px] cursor-pointer ${
+                          shape === 'square'
+                            ? 'bg-blue-700 text-white'
+                            : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
+                        }`}
+                      >
+                        Vuông (Chuẩn EU)
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Add to Cart quick button */}
+                  <button
+                    type="button"
+                    onClick={handleAddToCart}
+                    className="w-full py-2 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 text-xs font-bold border border-blue-200 flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[16px] text-blue-700">add_shopping_cart</span>
+                    <span>Thêm Vào Giỏ Hàng Chung</span>
+                  </button>
+
+                  {/* VAT & Price Calculation Table */}
+                  <div className="pt-3 border-t border-slate-200 flex flex-col gap-1.5 text-xs">
+                    <div className="flex justify-between text-slate-600">
+                      <span>Đơn giá (Đã gồm VAT):</span>
+                      <span className="font-bold text-slate-800">{currentItem.price.toLocaleString('vi-VN')} đ</span>
+                    </div>
+                    <div className="flex justify-between text-slate-600">
+                      <span>Số lượng:</span>
+                      <span className="font-bold text-slate-800">{quantity} thiết bị</span>
+                    </div>
+                    <div className="flex justify-between text-slate-600">
+                      <span>Thuế VAT:</span>
+                      <span className="font-semibold text-emerald-700">Đã bao gồm trong giá</span>
+                    </div>
+                    <div className="flex justify-between text-slate-600">
+                      <span>Vận chuyển:</span>
+                      <span className="font-bold text-emerald-700">0 đ (Freeship toàn quốc)</span>
+                    </div>
+                    <div className="pt-2 mt-1 border-t border-slate-200 flex justify-between items-baseline">
+                      <span className="text-xs font-black text-slate-900 uppercase">Thành tiền:</span>
+                      <span className="text-xl font-black text-[#e04b16] font-heading">
+                        {totalPrice.toLocaleString('vi-VN')} đ
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-emerald-700 text-right font-medium">
+                      (Đã bao gồm 100% thuế VAT)
+                    </span>
+                  </div>
+                </div>
+
+                {/* Right Column: STRICTLY 3 MANDATORY CORE FIELDS */}
+                <div className="md:col-span-7 flex flex-col gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-900 uppercase">
+                      2. Điền 3 Thông Tin Người Nhận Hàng:
+                    </span>
+                  </div>
+
+                  {/* Field 1: Họ và tên */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      1. Họ và tên người nhận <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Ví dụ: Nguyễn Văn An"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white"
+                    />
+                  </div>
+
+                  {/* Field 2: Số điện thoại */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-xs font-semibold text-slate-700">
+                        2. Số điện thoại nhận hàng (10 số) <span className="text-red-500">*</span>
+                      </label>
+                      {phoneNumber.trim().length > 0 && phoneValidation.carrier && (
+                        <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 flex items-center gap-1">
+                          <span className="material-symbols-outlined text-[13px]">cell_tower</span>
+                          <span>Mạng {phoneValidation.carrier}</span>
+                        </span>
+                      )}
+                    </div>
+                    <input
+                      type="tel"
+                      required
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      placeholder="Ví dụ: 0988 123 456"
+                      className={`w-full px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 bg-white transition-colors ${
+                        phoneNumber.trim().length > 0
+                          ? phoneValidation.isValid
+                            ? 'border-emerald-400 focus:ring-emerald-500'
+                            : 'border-amber-400 focus:ring-amber-500 bg-amber-50/20'
+                          : 'border-slate-300 focus:ring-blue-600'
+                      }`}
+                    />
+                    {/* Live phone feedback */}
+                    {phoneNumber.trim().length > 0 && (
+                      <div className="mt-1.5 flex items-center gap-1.5 text-xs">
+                        {phoneValidation.isValid ? (
+                          <div className="flex items-center gap-1 text-emerald-700 font-semibold text-[11px]">
+                            <span className="material-symbols-outlined text-[15px] text-emerald-600">verified</span>
+                            <span>{phoneValidation.message}</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1 text-amber-700 font-medium text-[11px]">
+                            <span className="material-symbols-outlined text-[15px] text-amber-600">error_outline</span>
+                            <span>{phoneValidation.message}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Field 3: Địa chỉ nhận hàng & Gợi ý nhanh */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-xs font-semibold text-slate-700">
+                        3. Địa chỉ nhận hàng chi tiết <span className="text-red-500">*</span>
+                      </label>
+                      <span className="text-[10px] text-slate-400">Giao tận nơi</span>
+                    </div>
+
+                    {/* Quick suggestion buttons */}
+                    <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                      <span className="text-[10px] text-slate-400 font-bold uppercase">Gợi ý nhanh:</span>
+                      {popularCities.map((city) => (
+                        <button
+                          key={city}
+                          type="button"
+                          onClick={() => handleQuickCity(city)}
+                          className={`text-[11px] px-2 py-0.5 rounded-md border font-medium transition-colors cursor-pointer ${
+                            address.includes(city)
+                              ? 'bg-blue-100 border-blue-300 text-blue-800 font-bold'
+                              : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
+                          }`}
+                        >
+                          + {city}
+                        </button>
+                      ))}
+                    </div>
+
+                    <input
+                      type="text"
+                      required
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      placeholder="Số nhà, tên đường, thôn/xóm, phường/xã, quận/huyện, tỉnh/thành..."
+                      className={`w-full px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 bg-white transition-colors ${
+                        address.trim().length > 0
+                          ? addressValidation.isDeliverable
+                            ? 'border-emerald-400 focus:ring-emerald-500'
+                            : 'border-amber-400 focus:ring-amber-500 bg-amber-50/20'
+                          : 'border-slate-300 focus:ring-blue-600'
+                      }`}
+                    />
+
+                    {/* Live Address Deliverability Radar */}
+                    {address.trim().length > 0 && (
+                      <div className="mt-2">
+                        {addressValidation.isDeliverable ? (
+                          <div className="p-2.5 bg-emerald-50/90 border border-emerald-200 rounded-xl text-xs text-emerald-900 flex items-start gap-2 shadow-2xs">
+                            <span className="material-symbols-outlined text-[18px] text-emerald-600 shrink-0 mt-0.5">
+                              local_shipping
+                            </span>
+                            <div className="flex-1">
+                              <div className="font-bold flex items-center gap-1 text-emerald-800">
+                                <span>Địa chỉ có thực & Sẵn sàng giao hàng</span>
+                                <span className="text-[10px] bg-emerald-200 text-emerald-900 px-1.5 py-0.2 rounded font-black">
+                                  100% Giao Được
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-emerald-700 mt-0.5">
+                                {addressValidation.carrierRoute} • Giao dự kiến: {addressValidation.estimatedDelivery}
+                              </p>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-start gap-2 shadow-2xs">
+                            <span className="material-symbols-outlined text-[18px] text-amber-600 shrink-0 mt-0.5">
+                              warning
+                            </span>
+                            <div className="flex-1">
+                              <div className="font-bold text-amber-800">
+                                Chưa đủ thông tin để bưu tá giao hàng
+                              </div>
+                              <p className="text-[11px] text-amber-700 mt-0.5">
+                                {addressValidation.message}
+                              </p>
+                              <p className="text-[10px] text-slate-500 mt-1 italic">
+                                * Cần: Tỉnh/Thành phố + Quận/Huyện + Số nhà hoặc Tên đường/Thôn xóm để bưu tá giao tận tay.
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Submit Button */}
+                  <div className="pt-2 flex flex-col gap-2">
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full py-3.5 px-4 rounded-xl text-sm sm:text-base font-extrabold text-white bg-[#e04b16] hover:bg-[#c93e0e] shadow-lg shadow-orange-500/25 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                    >
+                      {isSubmitting ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <>
+                          <span className="material-symbols-outlined text-[20px]">shopping_cart_checkout</span>
+                          <span>
+                            ĐẶT MUA NGAY • {totalPrice.toLocaleString('vi-VN')} đ (ĐÃ GỒM VAT)
+                          </span>
+                        </>
+                      )}
+                    </button>
+                    <p className="text-center text-[11px] text-slate-500">
+                      Nhận hàng kiểm tra cắm thử ưng ý mới thanh toán tiền (COD) • Miễn phí vận chuyển toàn quốc
+                    </p>
+                  </div>
+                </div>
               </div>
             </form>
           </div>
-
-          {/* Live Order Summary & Inclusions (Right Column) */}
-          <div className="lg:col-span-5 flex flex-col gap-6">
-            <div className="bg-[#f2f4f6] p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-md flex flex-col gap-5">
-              <div className="flex items-center justify-between pb-4 border-b border-slate-200">
-                <h3 className="text-lg font-bold text-slate-900 font-heading">Chi Tiết Đơn Hàng</h3>
-                <span className="text-xs text-blue-700 bg-blue-100 font-bold px-2.5 py-1 rounded-full">
-                  Flash Sale
-                </span>
-              </div>
-
-              <div className="flex flex-col gap-3 text-sm">
-                <div className="flex justify-between items-center text-slate-700">
-                  <span className="font-semibold">Gói đã chọn:</span>
-                  <span className="font-bold text-slate-900">{currentInfo.name}</span>
-                </div>
-
-                <div className="flex justify-between items-center text-slate-600 text-xs">
-                  <span>Chuẩn đế âm:</span>
-                  <span className="font-medium text-slate-800">
-                    {shape === 'rectangular' ? 'Đế chữ nhật (120x72mm)' : 'Đế vuông (86x86mm)'}
-                  </span>
-                </div>
-
-                {currentInfo.original > 0 && (
-                  <div className="flex justify-between items-center text-slate-500 text-xs">
-                    <span>Giá niêm yết:</span>
-                    <span className="line-through">{currentInfo.original.toLocaleString('vi-VN')}đ</span>
-                  </div>
-                )}
-
-                {discountAmount > 0 && (
-                  <div className="flex justify-between items-center text-emerald-700 font-semibold text-xs">
-                    <span>Chiết khấu Flash Sale:</span>
-                    <span>- {discountAmount.toLocaleString('vi-VN')}đ</span>
-                  </div>
-                )}
-
-                <div className="flex justify-between items-center text-slate-700 text-xs">
-                  <span>Phí vận chuyển:</span>
-                  <span className="text-emerald-700 font-bold">MIỄN PHÍ (FREESHIP)</span>
-                </div>
-
-                <div className="flex justify-between items-center text-slate-700 text-xs">
-                  <span>Phí duy trì máy chủ Cloud:</span>
-                  <span className="text-emerald-700 font-bold">0đ TRỌN ĐỜI</span>
-                </div>
-
-                <div className="pt-4 border-t border-slate-300/80 flex justify-between items-baseline">
-                  <span className="font-bold text-slate-900 text-base">Tổng thanh toán dự kiến:</span>
-                  <div className="text-right">
-                    <span className="text-2xl sm:text-3xl font-black font-heading text-[#e04b16]">
-                      {currentInfo.price > 0
-                        ? `${currentInfo.price.toLocaleString('vi-VN')}đ`
-                        : '0đ (Tư Vấn Miễn Phí)'}
-                    </span>
-                    <span className="block text-[11px] text-slate-500">
-                      (Thanh toán khi nhận hàng - COD)
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Hunonic Triple Guarantee */}
-            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col gap-4">
-              <span className="text-xs uppercase font-bold text-slate-600 tracking-wider">
-                Cam Kết 3 KHÔNG Từ Hunonic
-              </span>
-              <div className="space-y-3 text-xs sm:text-sm text-slate-700">
-                <div className="flex items-start gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
-                    ✓
-                  </span>
-                  <span>
-                    <strong>KHÔNG đục tường kéo dây:</strong> Lắp vừa 100% đế âm hiện hữu của mọi gia đình.
-                  </span>
-                </div>
-                <div className="flex items-start gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
-                    ✓
-                  </span>
-                  <span>
-                    <strong>KHÔNG thu phí duy trì:</strong> Không ép khách hàng trả phí duy trì hàng tháng.
-                  </span>
-                </div>
-                <div className="flex items-start gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
-                    ✓
-                  </span>
-                  <span>
-                    <strong>KHÔNG cần đặt cọc:</strong> Giao hàng tận nơi, mở hộp kiểm tra đúng hàng mới thanh toán.
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
-
-      {/* Order Confirmation Modal */}
-      {orderConfirmed && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 flex flex-col items-center text-center gap-4 relative animate-in fade-in zoom-in duration-300">
-            <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-1">
-              <span className="material-symbols-outlined text-[36px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                check_circle
-              </span>
-            </div>
-
-            <span className="text-xs uppercase tracking-widest font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-              Đặt Hàng Thành Công
-            </span>
-
-            <h3 className="text-2xl font-bold font-heading text-slate-900">
-              Cảm Ơn Quý Khách {fullName}!
-            </h3>
-
-            <p className="text-sm text-slate-600 leading-relaxed">
-              Mã đơn hàng của bạn là{' '}
-              <strong className="text-blue-700 font-mono font-bold text-base px-2 py-0.5 bg-blue-50 rounded border border-blue-200">
-                {orderCode}
-              </strong>
-              . Đội ngũ kỹ sư Hunonic sẽ liên hệ xác nhận đúng chuẩn đế âm và điều phối hàng trong vòng 15 phút.
-            </p>
-
-            <div className="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200 text-left text-xs space-y-2 text-slate-700">
-              <div className="flex justify-between">
-                <span className="text-slate-500">Gói sản phẩm:</span>
-                <span className="font-bold text-slate-900">{currentInfo.name}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Số điện thoại:</span>
-                <span className="font-bold text-slate-900">{phoneNumber}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Địa chỉ giao hàng:</span>
-                <span className="font-bold text-slate-900 truncate max-w-[200px]" title={address}>{address}</span>
-              </div>
-              <div className="flex justify-between text-emerald-800 bg-emerald-50/70 p-2 rounded-lg border border-emerald-200/60">
-                <span className="text-emerald-700 font-semibold flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[14px]">local_shipping</span>
-                  Viettel Post tiếp nhận:
-                </span>
-                <span className="font-bold text-right truncate max-w-[170px]" title={addressVerification?.viettelPostHub || 'Bưu cục Viettel Post trung tâm'}>
-                  {addressVerification?.viettelPostHub || 'Viettel Post Hub'}
-                </span>
-              </div>
-              <div className="flex justify-between pt-1 border-t border-slate-200 text-slate-900 font-bold">
-                <span>Tổng tiền COD:</span>
-                <span className="text-[#e04b16] font-heading text-sm">
-                  {currentInfo.price > 0 ? `${currentInfo.price.toLocaleString('vi-VN')}đ` : 'Tư Vấn Miễn Phí'}
-                </span>
-              </div>
-            </div>
-
-            {/* File sync badge */}
-            <div className="w-full p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[18px] text-emerald-600">task_alt</span>
-                <span className="font-semibold text-left">Đã ghi nhận họ tên, SĐT, địa chỉ vào file orders.csv</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsOrdersModalOpen(true)}
-                className="text-emerald-700 font-bold hover:underline shrink-0 text-[11px]"
-              >
-                Xem file
-              </button>
-            </div>
-
-            <div className="flex items-center gap-2 w-full pt-1">
-              <button
-                onClick={() => setIsOrdersModalOpen(true)}
-                className="flex-1 py-3 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center gap-1 border border-slate-300 transition-colors"
-              >
-                <span className="material-symbols-outlined text-[18px]">description</span>
-                <span>Xem file CSV</span>
-              </button>
-
-              <a
-                href="tel:0877999663"
-                className="flex-1 py-3 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center gap-1 border border-blue-200 transition-colors"
-              >
-                <span className="material-symbols-outlined text-[18px]">call</span>
-                <span>0877.999.663</span>
-              </a>
-            </div>
-
-            <button
-              onClick={() => setOrderConfirmed(false)}
-              className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md transition-colors mt-1"
-            >
-              Hoàn Tất & Tiếp Tục Xem
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Orders CSV File Viewer Modal */}
-      <OrdersFileModal
-        isOpen={isOrdersModalOpen}
-        onClose={() => setIsOrdersModalOpen(false)}
-        lastUpdated={lastUpdated}
-      />
     </section>
   );
 };

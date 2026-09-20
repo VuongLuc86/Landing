@@ -14,66 +14,66 @@ import { FlashSaleBanner } from './components/FlashSaleBanner';
 import { OrderFormSection } from './components/OrderFormSection';
 import { Footer } from './components/Footer';
 import { SmartSwitchSimulator } from './components/SmartSwitchSimulator';
-import { ProductCustomizerModal } from './components/ProductCustomizerModal';
+import { QuickOrderModal, QuickOrderTarget } from './components/QuickOrderModal';
+import { OrdersFileModal } from './components/OrdersFileModal';
 import { SocialProofToast } from './components/SocialProofToast';
 import { MobileStickyCTA } from './components/MobileStickyCTA';
+import { VisualMiniCartModal } from './components/VisualMiniCartModal';
+import { FloatingCartButton } from './components/FloatingCartButton';
+import { CartProvider, useCart } from './context/CartContext';
 import { Product } from './types';
 
-export default function App() {
+function AppContent() {
   const [isSimulatorOpen, setIsSimulatorOpen] = useState<boolean>(false);
-  const [selectedProductForModal, setSelectedProductForModal] = useState<Product | null>(null);
-  const [orderBundleId, setOrderBundleId] = useState<string>('combo-5');
-  const [customSwitchConfig, setCustomSwitchConfig] = useState<{
-    color: string;
-    gangs: number;
-    shape: string;
-    quantity?: number;
-  } | null>(null);
+  const [isQuickOrderOpen, setIsQuickOrderOpen] = useState<boolean>(false);
+  const [quickOrderTarget, setQuickOrderTarget] = useState<QuickOrderTarget | null>(null);
+  const [isOrdersFileModalOpen, setIsOrdersFileModalOpen] = useState<boolean>(false);
+  const [ordersFileLastUpdated, setOrdersFileLastUpdated] = useState<number>(Date.now());
 
-  const scrollToOrder = (bundleId?: string) => {
-    if (bundleId) {
-      setOrderBundleId(bundleId);
+  const { openCheckoutWithItem, setCheckoutStep, setIsCartOpen } = useCart();
+
+  // Function to open the quick order modal or visual mini cart with prefilled product
+  const handleOpenOrder = (target?: QuickOrderTarget | Product | string) => {
+    if (typeof target === 'string') {
+      setQuickOrderTarget({ bundleId: target });
+      setIsQuickOrderOpen(true);
+    } else if (target && 'price' in target && 'category' in target) {
+      // Product object: Open streamlined 3-field checkout directly
+      openCheckoutWithItem({
+        productId: target.id,
+        name: target.name,
+        category: target.category,
+        price: target.price,
+        originalPrice: target.originalPrice,
+        imageUrl: target.imageUrl,
+        quantity: 1,
+        shape: 'Đế Chữ nhật',
+        gangs: 4,
+        color: 'Đen Huyền Bí',
+        warranty: target.warranty,
+      });
+    } else if (target) {
+      setQuickOrderTarget(target as QuickOrderTarget);
+      setIsQuickOrderOpen(true);
+    } else {
+      setCheckoutStep('cart');
+      setIsCartOpen(true);
     }
-    const element = document.getElementById('dat-hang');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const handleSelectProduct = (product: Product) => {
-    setSelectedProductForModal(product);
-  };
-
-  const handleCustomOrder = (config: {
-    product: Product;
-    shape: string;
-    gangs?: number;
-    color?: string;
-    quantity: number;
-  }) => {
-    setOrderBundleId(config.product.id);
-    setCustomSwitchConfig({
-      color: config.color || '',
-      gangs: config.gangs || 1,
-      shape: config.shape,
-      quantity: config.quantity,
-    });
-    scrollToOrder(config.product.id);
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f7f9fb] text-[#191c1e] relative">
       {/* Top Fixed Navigation */}
       <Navbar
-        onOpenOrder={() => scrollToOrder()}
+        onOpenOrder={() => handleOpenOrder('switch-luxury')}
         onOpenSimulator={() => setIsSimulatorOpen(true)}
       />
 
-      {/* Main Content Sections (With padding-top to account for fixed navbar) */}
+      {/* Main Content Sections */}
       <main className="flex-1 pt-28 sm:pt-32">
         {/* Section 1: Hero */}
         <HeroSection
-          onOpenOrder={() => scrollToOrder()}
+          onOpenOrder={() => handleOpenOrder('switch-luxury')}
           onOpenSimulator={() => setIsSimulatorOpen(true)}
         />
 
@@ -98,34 +98,43 @@ export default function App() {
 
             <SmartSwitchSimulator
               onSelectForOrder={(config) => {
-                setCustomSwitchConfig(config);
-                scrollToOrder('switch-luxury');
+                handleOpenOrder({
+                  bundleId: 'switch-luxury',
+                  color: config.color,
+                  gangs: config.gangs,
+                  shape: config.shape,
+                  quantity: config.quantity || 1,
+                });
               }}
             />
           </div>
         </section>
 
-        {/* Section 3: Flagship Products */}
+        {/* Section 3: Flagship Products with Mini-Cart & Buy Now Integration */}
         <ProductShowcase
-          onSelectProduct={handleSelectProduct}
+          onSelectProduct={(product) => handleOpenOrder(product)}
           onOpenSimulator={() => setIsSimulatorOpen(true)}
         />
 
         {/* Section 4: Comparison Table */}
         <ComparisonTable />
 
-        {/* Section 5: 5.000+ Customer Reviews & 5 Golden Commitments */}
+        {/* Section 5: Customer Reviews & Golden Commitments */}
         <ReviewsAndCommitments />
 
-        {/* Section 6: Flash Sale Banner & 3 Combo Packages */}
+        {/* Section 6: Flash Sale Banner & Combo Packages */}
         <FlashSaleBanner
-          onSelectCombo={(comboId) => scrollToOrder(comboId)}
+          onSelectCombo={(comboId) => handleOpenOrder(comboId)}
         />
 
-        {/* Section 7: Order Form & Instant Confirmation */}
+        {/* Section 7: Streamlined 3-Field Order Section */}
         <OrderFormSection
-          initialBundleId={orderBundleId}
-          initialCustomConfig={customSwitchConfig}
+          initialBundleId={quickOrderTarget?.bundleId || 'switch-luxury'}
+          onOpenQuickOrderModal={(target) => handleOpenOrder(target)}
+          onOpenOrdersFileModal={() => {
+            setOrdersFileLastUpdated(Date.now());
+            setIsOrdersFileModalOpen(true);
+          }}
         />
       </main>
 
@@ -139,29 +148,65 @@ export default function App() {
           onClose={() => setIsSimulatorOpen(false)}
           onSelectForOrder={(config) => {
             setIsSimulatorOpen(false);
-            setCustomSwitchConfig(config);
-            scrollToOrder('switch-luxury');
+            handleOpenOrder({
+              bundleId: 'switch-luxury',
+              color: config.color,
+              gangs: config.gangs,
+              shape: config.shape,
+              quantity: config.quantity || 1,
+            });
           }}
         />
       )}
 
-      {/* Product Customizer Modal */}
-      {selectedProductForModal && (
-        <ProductCustomizerModal
-          product={selectedProductForModal}
-          onClose={() => setSelectedProductForModal(null)}
-          onProceedOrder={handleCustomOrder}
-        />
-      )}
+      {/* Visual Mini Cart Popup & 3-Field Instant Checkout */}
+      <VisualMiniCartModal
+        onViewOrdersFile={() => {
+          setOrdersFileLastUpdated(Date.now());
+          setIsOrdersFileModalOpen(true);
+        }}
+      />
+
+      {/* Floating Cart Button with Realtime Count & Price */}
+      <FloatingCartButton />
+
+      {/* Quick Order Popup Modal (for detailed config options) */}
+      <QuickOrderModal
+        isOpen={isQuickOrderOpen}
+        onClose={() => setIsQuickOrderOpen(false)}
+        target={quickOrderTarget}
+        onViewOrdersFile={() => {
+          setOrdersFileLastUpdated(Date.now());
+          setIsOrdersFileModalOpen(true);
+        }}
+      />
+
+      {/* Orders CSV File Viewer Modal */}
+      <OrdersFileModal
+        isOpen={isOrdersFileModalOpen}
+        onClose={() => setIsOrdersFileModalOpen(false)}
+        lastUpdated={ordersFileLastUpdated}
+      />
 
       {/* Real-time Order Social Proof Toast */}
       <SocialProofToast />
 
       {/* Mobile Bottom Sticky Bar */}
       <MobileStickyCTA
-        onOpenOrder={() => scrollToOrder()}
+        onOpenOrder={() => {
+          setCheckoutStep('cart');
+          setIsCartOpen(true);
+        }}
         onOpenSimulator={() => setIsSimulatorOpen(true)}
       />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <CartProvider>
+      <AppContent />
+    </CartProvider>
   );
 }

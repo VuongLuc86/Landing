@@ -1,5 +1,5 @@
 export type ProductShape = 'rectangular' | 'square';
-export type ProductColor = 'champagne' | 'black';
+export type ProductColor = 'champagne' | 'black' | 'white';
 
 export interface ProductSpecItem {
   label: string;
@@ -21,6 +21,7 @@ export interface Product {
   promotionNote?: string;
   shortDesc: string;
   imageUrl: string;
+  fallbackImageUrl?: string;
   specs: string[];
   detailedSpecs?: ProductSpecItem[];
   features: string[];
@@ -90,4 +91,27 @@ export interface CsvOrderItem {
   orderDate: string;
   amount: number;
   note: string;
+}
+
+export interface CartItem {
+  id: string;
+  productId: string;
+  name: string;
+  category: string;
+  price: number;
+  originalPrice: number;
+  imageUrl: string;
+  shape?: string;
+  gangs?: number;
+  color?: string;
+  quantity: number;
+  warranty?: string;
+}
+
+export interface CustomerProfile {
+  fullName: string;
+  phone: string;
+  province?: string;
+  district?: string;
+  address: string;
 }

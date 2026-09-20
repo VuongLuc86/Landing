@@ -9,10 +9,13 @@ export const Footer: React.FC = () => {
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <img
-                src="https://lh3.googleusercontent.com/aida/AEtjO1WwApXhyfe0C7RxI8bpDImaN9CAY_AQGFMoy-7su5Cbvai907OOVYJdHBbnf7tapKMIYS-4Ip80Q74y7n8w27Vx0-dOlJADPBJACyeVANIYoYSSS7RJgXr_8pJJxwzeiYiNruIY1WJJWjJbCF52L-mC1Vj7DaLh5Nw1dJzqG5Ac4WbrMYRLHo4xy1M22oK0nHbHgfRV89Y4t3m25zvJ-gUm08bhxZ_mhRrlzbjeV4pSEOFfNsZATNjCKoU"
+                src="https://hunonic.com/wp-content/uploads/2024/05/logo-hunonic-ngang-1-1.png"
                 alt="Điện 365 Đại lý chính thức của HUNONIC"
-                className="h-10 w-auto object-contain brightness-0 invert"
+                className="h-8 w-auto object-contain brightness-0 invert"
                 referrerPolicy="no-referrer"
+                onError={(e) => {
+                  e.currentTarget.src = '/images/hunonic/logo-hunonic-ngang.png';
+                }}
               />
               <div className="flex flex-col border-l border-slate-700 pl-3">
                 <span className="text-sm font-black font-heading text-white">Điện 365</span>

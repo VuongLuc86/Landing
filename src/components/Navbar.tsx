@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useCart } from '../context/CartContext';
 
 interface NavbarProps {
   onOpenOrder: (bundleId?: string) => void;
@@ -7,6 +8,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder, onOpenSimulator }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { totalItemsCount, setIsCartOpen, setCheckoutStep } = useCart();
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50 flex flex-col">
@@ -25,10 +27,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder, onOpenSimulator }) 
           {/* Brand Logo */}
           <a href="#" className="flex items-center gap-3 shrink-0 group">
             <img
-              src="https://lh3.googleusercontent.com/aida/AEtjO1WwApXhyfe0C7RxI8bpDImaN9CAY_AQGFMoy-7su5Cbvai907OOVYJdHBbnf7tapKMIYS-4Ip80Q74y7n8w27Vx0-dOlJADPBJACyeVANIYoYSSS7RJgXr_8pJJxwzeiYiNruIY1WJJWjJbCF52L-mC1Vj7DaLh5Nw1dJzqG5Ac4WbrMYRLHo4xy1M22oK0nHbHgfRV89Y4t3m25zvJ-gUm08bhxZ_mhRrlzbjeV4pSEOFfNsZATNjCKoU"
+              src="https://hunonic.com/wp-content/uploads/2024/05/logo-hunonic-ngang-1-1.png"
               alt="Điện 365 Đại lý chính thức của HUNONIC"
-              className="h-10 sm:h-11 w-auto object-contain group-hover:scale-105 transition-transform"
+              className="h-8 sm:h-9 w-auto object-contain group-hover:scale-105 transition-transform"
               referrerPolicy="no-referrer"
+              onError={(e) => {
+                e.currentTarget.src = '/images/hunonic/logo-hunonic-ngang.png';
+              }}
             />
             <div className="hidden sm:flex flex-col border-l border-slate-200 pl-3">
               <span className="text-sm font-black font-heading text-slate-900 leading-tight">
@@ -88,7 +93,26 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder, onOpenSimulator }) 
           </nav>
 
           {/* Header Action Buttons */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Cart Icon Trigger */}
+            <button
+              type="button"
+              onClick={() => {
+                setCheckoutStep('cart');
+                setIsCartOpen(true);
+              }}
+              className="relative p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 transition-colors flex items-center gap-1.5 cursor-pointer"
+              title="Xem giỏ hàng"
+            >
+              <span className="material-symbols-outlined text-[22px] text-slate-800">shopping_bag</span>
+              <span className="hidden sm:inline-block text-xs font-bold">Giỏ Hàng</span>
+              {totalItemsCount > 0 && (
+                <span className="inline-flex items-center justify-center bg-[#e04b16] text-white text-[11px] font-black rounded-full w-5 h-5 shadow-xs">
+                  {totalItemsCount}
+                </span>
+              )}
+            </button>
+
             <a
               href="tel:0877999663"
               className="hidden md:inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 text-blue-700 text-sm font-semibold hover:bg-blue-100/70 transition-colors border border-blue-200/50 group"
@@ -101,10 +125,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder, onOpenSimulator }) 
 
             <button
               onClick={() => onOpenOrder()}
-              className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-white text-xs sm:text-sm font-bold shadow-lg btn-cta-action transition-all hover:scale-105 active:scale-95"
+              className="inline-flex items-center gap-2 px-3.5 sm:px-5 py-2.5 rounded-xl text-white text-xs sm:text-sm font-bold shadow-lg btn-cta-action transition-all hover:scale-105 active:scale-95"
             >
-              <span className="material-symbols-outlined text-[18px] sm:text-[20px]">shopping_cart</span>
-              <span>ĐẶT HÀNG NGAY — GIÁ ĐẠI LÝ</span>
+              <span className="material-symbols-outlined text-[18px] sm:text-[20px]">flash_on</span>
+              <span className="hidden xs:inline">ĐẶT HÀNG — GIÁ ĐẠI LÝ</span>
+              <span className="xs:hidden">ĐẶT HÀNG</span>
             </button>
 
             {/* Mobile Menu Toggle Button */}

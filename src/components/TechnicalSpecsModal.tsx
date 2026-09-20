@@ -52,6 +52,11 @@ export const TechnicalSpecsModal: React.FC<TechnicalSpecsModalProps> = ({
               alt={product.name}
               className="w-full h-full object-contain"
               referrerPolicy="no-referrer"
+              onError={(e) => {
+                if (product.fallbackImageUrl && !e.currentTarget.src.includes(product.fallbackImageUrl)) {
+                  e.currentTarget.src = product.fallbackImageUrl;
+                }
+              }}
             />
           </div>
           <div className="flex-1 flex flex-col gap-1.5 text-center sm:text-left">

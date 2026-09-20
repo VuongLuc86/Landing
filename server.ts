@@ -244,6 +244,9 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', contactPhone: '0877.999.663' });
 });
 
+// Serve public assets (including Hunonic images)
+app.use(express.static(path.join(process.cwd(), 'public')));
+
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({

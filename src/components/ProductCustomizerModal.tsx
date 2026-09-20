@@ -87,6 +87,11 @@ export const ProductCustomizerModal: React.FC<CustomizerModalProps> = ({
                 alt={product.name}
                 className="max-w-full max-h-full object-contain"
                 referrerPolicy="no-referrer"
+                onError={(e) => {
+                  if (product.fallbackImageUrl && !e.currentTarget.src.includes(product.fallbackImageUrl)) {
+                    e.currentTarget.src = product.fallbackImageUrl;
+                  }
+                }}
               />
             </div>
             <div className="mt-3 text-center">

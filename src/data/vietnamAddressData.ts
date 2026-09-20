@@ -487,3 +487,5 @@ export function parseAndVerifyVietnamAddress(rawAddress: string): AddressMatchRe
     googleMapsQuery,
   };
 }
+
+export const validateAndMatchVietnamAddress = parseAndVerifyVietnamAddress;

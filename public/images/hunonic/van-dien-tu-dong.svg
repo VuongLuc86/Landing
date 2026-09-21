@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="brassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d97706"/>
+      <stop offset="40%" stop-color="#f59e0b"/>
+      <stop offset="70%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+    <linearGradient id="coilGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="50%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="#f8fafc"/>
+  <g transform="translate(200, 210)">
+    <!-- Valve Body Brass Bottom -->
+    <path d="M-130,40 L-130,90 C-130,95 -125,100 -120,100 L120,100 C125,100 130,95 130,90 L130,40 L70,40 L70,10 L-70,10 L-70,40 Z" fill="url(#brassGrad)" stroke="#78350f" stroke-width="2.5"/>
+    <!-- Threaded pipe ends -->
+    <rect x="-145" y="45" width="18" height="50" rx="3" fill="url(#brassGrad)" stroke="#78350f" stroke-width="2"/>
+    <rect x="127" y="45" width="18" height="50" rx="3" fill="url(#brassGrad)" stroke="#78350f" stroke-width="2"/>
+    <!-- Flow arrow -->
+    <path d="M-40,70 L20,70 L20,60 L40,75 L20,90 L20,80 L-40,80 Z" fill="#78350f" opacity="0.6"/>
+    <!-- Solenoid Electrical Coil (Top Black Cylinder) -->
+    <rect x="-55" y="-120" width="110" height="125" rx="10" fill="url(#coilGrad)" stroke="#0f172a" stroke-width="3"/>
+    <!-- Top Nut -->
+    <rect x="-25" y="-140" width="50" height="22" rx="4" fill="url(#brassGrad)" stroke="#78350f" stroke-width="2"/>
+    <!-- Electrical DIN connector on side -->
+    <rect x="50" y="-95" width="45" height="50" rx="6" fill="#0284c7" stroke="#0369a1" stroke-width="2"/>
+    <text x="72" y="-65" fill="#ffffff" font-family="Arial, sans-serif" font-weight="bold" font-size="10" text-anchor="middle">220V</text>
+    <!-- Label on Coil -->
+    <text x="0" y="-70" fill="#ffffff" font-family="Arial, sans-serif" font-weight="900" font-size="13" text-anchor="middle">SOLENOID</text>
+    <text x="0" y="-52" fill="#38bdf8" font-family="Arial, sans-serif" font-weight="bold" font-size="11" text-anchor="middle">VALVE 220VAC</text>
+    <text x="0" y="-35" fill="#94a3b8" font-family="Arial, sans-serif" font-weight="bold" font-size="10" text-anchor="middle">HUNONIC AGRI</text>
+  </g>
+</svg>

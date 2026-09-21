@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="rgbicRainbow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="20%" stop-color="#f97316"/>
+      <stop offset="40%" stop-color="#eab308"/>
+      <stop offset="60%" stop-color="#22c55e"/>
+      <stop offset="80%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="#f8fafc"/>
+  <g transform="translate(200, 200)">
+    <!-- Spool Frame -->
+    <circle cx="0" cy="0" r="145" fill="#18181b" stroke="#3f3f46" stroke-width="4"/>
+    <!-- Outer Spool Ribs -->
+    <circle cx="0" cy="0" r="130" fill="none" stroke="#27272a" stroke-width="16"/>
+    <!-- Rainbow Coiled LED strip -->
+    <circle cx="0" cy="0" r="115" fill="none" stroke="url(#rgbicRainbow)" stroke-width="18" stroke-dasharray="14 4"/>
+    <circle cx="0" cy="0" r="95" fill="none" stroke="url(#rgbicRainbow)" stroke-width="16" stroke-dasharray="12 4"/>
+    <circle cx="0" cy="0" r="75" fill="none" stroke="url(#rgbicRainbow)" stroke-width="14" stroke-dasharray="10 3"/>
+    <!-- Center Hub -->
+    <circle cx="0" cy="0" r="52" fill="#09090b" stroke="#52525b" stroke-width="3"/>
+    <circle cx="0" cy="0" r="18" fill="#27272a"/>
+    <text x="0" y="-12" fill="#ffffff" font-family="Arial, sans-serif" font-weight="900" font-size="11" text-anchor="middle">HUNONIC</text>
+    <text x="0" y="4" fill="#38bdf8" font-family="Arial, sans-serif" font-weight="bold" font-size="9" text-anchor="middle">RGBIC 5M</text>
+    <text x="0" y="16" fill="#f43f5e" font-family="Arial, sans-serif" font-size="8" text-anchor="middle">DreamColor</text>
+  </g>
+</svg>

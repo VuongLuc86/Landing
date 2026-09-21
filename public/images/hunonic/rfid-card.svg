@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#090d16"/>
+    </linearGradient>
+    <linearGradient id="goldChip" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="50%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="#f8fafc"/>
+  <g transform="translate(60, 70) rotate(-5 140 130)">
+    <!-- Shadow -->
+    <rect x="5" y="8" width="270" height="175" rx="14" fill="#000" opacity="0.15" filter="blur(8px)"/>
+    <!-- Card Body -->
+    <rect x="0" y="0" width="270" height="175" rx="14" fill="url(#cardGrad)" stroke="#334155" stroke-width="2"/>
+    <!-- Wireless signal waves -->
+    <g transform="translate(210, 25)" stroke="#60a5fa" stroke-width="2.5" fill="none" opacity="0.9">
+      <path d="M0,20 A15,15 0 0,1 15,5" stroke-linecap="round"/>
+      <path d="M0,28 A23,23 0 0,1 23,5" stroke-linecap="round"/>
+      <path d="M0,36 A31,31 0 0,1 31,5" stroke-linecap="round"/>
+    </g>
+    <!-- Smart Chip -->
+    <rect x="30" y="55" width="48" height="38" rx="6" fill="url(#goldChip)" stroke="#b45309" stroke-width="1.5"/>
+    <line x1="30" y1="74" x2="78" y2="74" stroke="#78350f" stroke-width="1.2"/>
+    <line x1="54" y1="55" x2="54" y2="93" stroke="#78350f" stroke-width="1.2"/>
+    <!-- Hunonic Branding -->
+    <text x="30" y="38" fill="#ffffff" font-family="Arial, sans-serif" font-weight="900" font-size="16" letter-spacing="1">HUNONIC</text>
+    <text x="30" y="145" fill="#94a3b8" font-family="Arial, sans-serif" font-weight="600" font-size="10">RFID SMART KEY CARD</text>
+    <text x="30" y="160" fill="#e2e8f0" font-family="Courier, monospace" font-size="12" letter-spacing="2">HN-8842-SECURE</text>
+  </g>
+  <!-- Mini RFID Tag Fob -->
+  <g transform="translate(240, 250)">
+    <circle cx="45" cy="45" r="40" fill="#2563eb" stroke="#1d4ed8" stroke-width="3"/>
+    <circle cx="45" cy="18" r="7" fill="#ffffff" stroke="#1e40af" stroke-width="2"/>
+    <text x="45" y="52" fill="#ffffff" font-family="Arial, sans-serif" font-weight="bold" font-size="11" text-anchor="middle">RFID</text>
+    <text x="45" y="66" fill="#bfdbfe" font-family="Arial, sans-serif" font-size="8" text-anchor="middle">13.56MHz</text>
+  </g>
+</svg>

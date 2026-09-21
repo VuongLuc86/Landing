@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <rect width="400" height="400" fill="#f8fafc"/>
+  <g transform="translate(130, 80)">
+    <!-- Main Sensor Puck -->
+    <circle cx="70" cy="70" r="65" fill="#ffffff" stroke="#cbd5e1" stroke-width="3"/>
+    <!-- Water Drop Icon -->
+    <path d="M70,35 C70,35 95,70 95,85 C95,98 84,108 70,108 C56,108 45,98 45,85 C45,70 70,35 70,35 Z" fill="#0284c7"/>
+    <circle cx="70" cy="118" r="4" fill="#22c55e"/>
+    <!-- Wire to probe -->
+    <path d="M70,135 C70,170 30,190 30,220" fill="none" stroke="#64748b" stroke-width="4"/>
+    <!-- Gold Contact Probe Plate -->
+    <g transform="translate(10, 220)">
+      <rect x="0" y="0" width="40" height="50" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+      <!-- Gold pins -->
+      <rect x="8" y="45" width="6" height="15" fill="#eab308"/>
+      <rect x="26" y="45" width="6" height="15" fill="#eab308"/>
+    </g>
+    <text x="70" y="15" fill="#0f172a" font-family="Arial, sans-serif" font-weight="bold" font-size="12" text-anchor="middle">CẢM BIẾN TRÀN NƯỚC</text>
+  </g>
+</svg>

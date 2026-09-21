@@ -33,7 +33,7 @@ const INITIAL_FEATURED_PRODUCTS: Product[] = [
     warranty: '24 Tháng (1 Đổi 1)',
     promotionNote: 'Tặng sơ đồ đấu nối + Miễn phí Server Cloud trọn đời',
     shortDesc: 'Mặt kính cường lực vát cạnh 2.5D, viền nhôm Anode vát kim cương, 1-4 nút cảm ứng siêu nhạy.',
-    imageUrl: 'https://hunonic.com/wp-content/uploads/2024/06/hunonic-cam-ung.jpg',
+    imageUrl: '/images/hunonic/hunonic-cam-ung.jpg',
     fallbackImageUrl: '/images/hunonic/hunonic-cam-ung.jpg',
     specs: [
       'Công suất: 500W/kênh LED (tổng 2000W), điện áp 95-250V AC',
@@ -83,7 +83,7 @@ const INITIAL_FEATURED_PRODUCTS: Product[] = [
     warranty: '24 Tháng (1 Đổi 1)',
     promotionNote: 'Phím cơ đàn hồi nẩy tay + Không bám vân tay + Mặt nhôm nguyên khối',
     shortDesc: 'Phím bấm vật lý cơ học nẩy tay êm ái, viền kim loại cao cấp, vừa vặn đế âm chữ nhật và vuông.',
-    imageUrl: 'https://hunonic.com/wp-content/uploads/2025/12/cong-tac-co-hnn-smech-menu.jpg',
+    imageUrl: '/images/hunonic/cong-tac-co-hnn-smech.jpg',
     fallbackImageUrl: '/images/hunonic/cong-tac-co-hnn-smech.jpg',
     specs: [
       'Công suất tải: 500W/kênh đèn LED (Tổng 2000W), điện áp 95-250V AC',
@@ -132,7 +132,7 @@ const INITIAL_FEATURED_PRODUCTS: Product[] = [
     warranty: '24 Tháng (1 Đổi 1)',
     promotionNote: 'Miễn phí vận chuyển COD + Kỹ sư hướng dẫn đấu nối 1:1',
     shortDesc: 'Rơ-le công suất khủng 30A - 4000W, có ăng-ten bắt sóng Wi-Fi xuyên tường cực mạnh.',
-    imageUrl: 'https://hunonic.com/wp-content/uploads/2024/06/lahu.jpg',
+    imageUrl: '/images/hunonic/lahu.jpg',
     fallbackImageUrl: '/images/hunonic/lahu.jpg',
     specs: [
       'Công suất cực đại: 4000W (30A) cho bình nóng lạnh, điều hòa, máy bơm',
@@ -170,7 +170,7 @@ const INITIAL_FEATURED_PRODUCTS: Product[] = [
     warranty: '24 Tháng (1 Đổi 1)',
     promotionNote: 'Tương thích 99% các loại hộp điều khiển cửa cuốn trên thị trường',
     shortDesc: 'Mặt kính cảm ứng Lên - Dừng - Xuống, đóng/mở cửa cuốn bằng điện thoại dù ở bất cứ đâu.',
-    imageUrl: 'https://hunonic.com/wp-content/uploads/2024/06/cua-cuon-hunonic.jpg',
+    imageUrl: '/images/hunonic/cua-cuon-hunonic.jpg',
     fallbackImageUrl: '/images/hunonic/cua-cuon-hunonic.jpg',
     specs: [
       'Điều khiển đóng/mở cửa cuốn từ xa qua 4G/Wi-Fi an toàn',
@@ -207,7 +207,7 @@ const INITIAL_FEATURED_PRODUCTS: Product[] = [
     warranty: '24 Tháng (1 Đổi 1)',
     promotionNote: 'Mặt kính chịu nhiệt chống trầy + Đo kWh điện năng thực',
     shortDesc: 'Chịu tải 4000W (16A), đo điện năng kWh theo ngày/tháng, chống giật an toàn cho trẻ nhỏ.',
-    imageUrl: 'https://hunonic.com/wp-content/uploads/2024/06/o-cam-sk01.jpg',
+    imageUrl: '/images/hunonic/o-cam-sk01.jpg',
     fallbackImageUrl: '/images/hunonic/o-cam-sk01.jpg',
     specs: [
       'Công suất cực đại: 4000W - 16A, màn che bảo vệ trẻ em',
@@ -243,7 +243,7 @@ const INITIAL_FEATURED_PRODUCTS: Product[] = [
     warranty: '12 Tháng (1 Đổi 1)',
     promotionNote: 'Mua 3 tặng 1 + Cắm dùng ngay không cần lắp đặt',
     shortDesc: 'Cắm nối tiếp vào bất kỳ ổ điện nào trong nhà, biến quạt, ấm đun nước thành thiết bị thông minh.',
-    imageUrl: 'https://hunonic.com/wp-content/uploads/2026/06/sk02-png.png',
+    imageUrl: '/images/hunonic/sk02.png',
     fallbackImageUrl: '/images/hunonic/sk02.png',
     specs: [
       'Công suất 2500W - 10A, cắm trực tiếp ổ tường',
@@ -279,7 +279,7 @@ const INITIAL_FEATURED_PRODUCTS: Product[] = [
     warranty: '24 Tháng (1 Đổi 1)',
     promotionNote: 'Hạ điện áp lên phao bồn nước xuống 12V + Triệt tiêu nguy cơ rò điện',
     shortDesc: 'Bảo vệ chống giật khi bơm nước lên bồn téc, triệt tiêu 100% điện giật nguy hiểm từ phao điện mái nhà.',
-    imageUrl: 'https://hunonic.com/wp-content/uploads/2025/07/o-cam-sps-png.png',
+    imageUrl: '/images/hunonic/o-cam-sps.png',
     fallbackImageUrl: '/images/hunonic/o-cam-sps.png',
     specs: [
       'Công suất chịu tải: 3000W (chuyên dụng mọi máy bơm gia đình và công nghiệp nhỏ)',
@@ -316,7 +316,7 @@ const INITIAL_FEATURED_PRODUCTS: Product[] = [
     warranty: '24 Tháng (1 Đổi 1)',
     promotionNote: 'Màn hình LCD đo kWh thời gian thực + Cắt điện từ xa bảo vệ gia đình',
     shortDesc: 'Gắn tủ điện tổng hoặc từng tầng, đo lượng điện tiêu thụ toàn nhà, tự ngắt khi chạm chập quá tải.',
-    imageUrl: 'https://hunonic.com/wp-content/uploads/2024/05/notec.jpg',
+    imageUrl: '/images/hunonic/aptomat-notec-real.jpg',
     fallbackImageUrl: '/images/hunonic/notec.jpg',
     specs: [
       'Dòng định mức: 63A, ngắt mạch cực nhanh bảo vệ toàn bộ mạng điện',
@@ -352,7 +352,7 @@ const INITIAL_FEATURED_PRODUCTS: Product[] = [
     warranty: '24 Tháng (1 Đổi 1)',
     promotionNote: 'Thư viện hơn 8.000 thiết bị + Học lệnh remote lạ',
     shortDesc: 'Thay thế toàn bộ remote điều hòa, quạt mát, tivi trong phòng. Bật làm mát trước khi về nhà.',
-    imageUrl: 'https://hunonic.com/wp-content/uploads/2024/05/ir-icon.jpg',
+    imageUrl: '/images/hunonic/ir-icon.jpg',
     fallbackImageUrl: '/images/hunonic/ir-icon.jpg',
     specs: [
       'Mắt phát hồng ngoại 360 độ bán kính 8-10m không điểm mù',
@@ -387,7 +387,7 @@ const INITIAL_FEATURED_PRODUCTS: Product[] = [
     warranty: '24 Tháng (1 Đổi 1)',
     promotionNote: 'Tặng kèm pin lithium 2 năm + Băng keo 3M chuyên dụng',
     shortDesc: 'Phát hiện khói sớm bằng quang điện tử, còi hú 85dB tại chỗ và đẩy tin khẩn cấp về điện thoại.',
-    imageUrl: 'https://hunonic.com/wp-content/uploads/2024/05/icon-cam-bien-khoi.jpg',
+    imageUrl: '/images/hunonic/cam-bien-khoi-real.jpg',
     fallbackImageUrl: '/images/hunonic/icon-cam-bien-khoi.jpg',
     specs: [
       'Còi hú báo động âm lượng 85dB cảnh báo cho mọi người trong nhà',
@@ -422,7 +422,7 @@ const INITIAL_FEATURED_PRODUCTS: Product[] = [
     warranty: '24 Tháng (1 Đổi 1)',
     promotionNote: 'Không bao giờ tự tắt đèn khi đang ngồi yên làm việc hay đọc sách',
     shortDesc: 'Phát hiện nhịp thở và vi chuyển động chính xác 100%, khắc phục nhược điểm cảm biến hồng ngoại PIR cũ.',
-    imageUrl: 'https://hunonic.com/wp-content/uploads/2024/05/hien-dien.jpg',
+    imageUrl: '/images/hunonic/hien-dien.jpg',
     fallbackImageUrl: '/images/hunonic/hien-dien.jpg',
     specs: [
       'Công nghệ Radar mmWave tần số 24GHz nhận diện người ngồi tĩnh tại',
@@ -459,7 +459,7 @@ const INITIAL_FEATURED_PRODUCTS: Product[] = [
     warranty: '24 Tháng (1 Đổi 1)',
     promotionNote: 'Miễn phí công lắp đặt tại nhà + Tặng 2 thẻ từ RFID và 2 chìa cơ chống sao chép',
     shortDesc: '5 phương thức mở khóa: Vân tay sinh trắc học 0.3s, mã số ảo chống nhìn trộm, thẻ từ, chìa cơ và App.',
-    imageUrl: 'https://hunonic.com/wp-content/uploads/2024/08/khoa-den.png',
+    imageUrl: '/images/hunonic/khoa-cua-go-tdl68.jpg',
     fallbackImageUrl: '/images/hunonic/khoa-den.png',
     specs: [
       'Cảm biến vân tay FPC Thụy Điển trên tay nắm, mở cửa chỉ 0.3s',
@@ -496,7 +496,7 @@ const INITIAL_FEATURED_PRODUCTS: Product[] = [
     warranty: '24 Tháng (1 Đổi 1)',
     promotionNote: 'Chuẩn Wi-Fi độc lập + Mặt kính cường lực chống cháy',
     shortDesc: 'Dòng công tắc cảm ứng thông minh phổ thông, thẩm mỹ thanh lịch, giá thành tối ưu cho mọi ngôi nhà.',
-    imageUrl: 'https://hunonic.com/wp-content/uploads/2021/10/CONG-TAC-THONG-MINH-HUNONIC-DATIC-BASIC.jpg',
+    imageUrl: '/images/hunonic/datic-basic.jpg',
     fallbackImageUrl: '/images/hunonic/datic-basic.jpg',
     specs: [
       'Công suất 500W/nút tải LED, phù hợp chiếu sáng mọi căn phòng',
@@ -542,7 +542,7 @@ const INITIAL_FEATURED_PRODUCTS: Product[] = [
     warranty: '24 Tháng (1 Đổi 1)',
     promotionNote: 'Hình ảnh Full HD sắc nét + Tự động bám đuổi chuyển động',
     shortDesc: 'Xoay 360 độ quan sát toàn cảnh, đàm thoại 2 chiều to rõ, tích hợp sâu vào hệ sinh thái nhà Hunonic.',
-    imageUrl: 'https://hunonic.com/wp-content/uploads/2024/05/icat.jpg',
+    imageUrl: '/images/hunonic/icat.jpg',
     fallbackImageUrl: '/images/hunonic/icat.jpg',
     specs: [
       'Độ phân giải Full HD sắc nét, quay quét ngang 355° dọc 90°',

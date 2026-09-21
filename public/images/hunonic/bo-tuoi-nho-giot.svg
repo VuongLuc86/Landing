@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <rect width="400" height="400" fill="#f8fafc"/>
+  <g transform="translate(80, 60)">
+    <!-- Water Timer Module -->
+    <rect x="40" y="0" width="160" height="150" rx="14" fill="#059669" stroke="#047857" stroke-width="3"/>
+    <!-- Dial / Display -->
+    <circle cx="120" cy="65" r="40" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+    <!-- Water Droplet -->
+    <path d="M120,40 C120,40 135,62 135,72 C135,80 128,87 120,87 C112,87 105,80 105,72 C105,62 120,40 120,40 Z" fill="#0284c7"/>
+    <text x="120" y="130" fill="#ffffff" font-family="Arial, sans-serif" font-weight="bold" font-size="11" text-anchor="middle">HUNONIC BALCONY</text>
+    <!-- Distribution tubing & drip nozzles -->
+    <path d="M120,150 L120,200 L0,200 L0,260" fill="none" stroke="#1e293b" stroke-width="6" stroke-linecap="round"/>
+    <path d="M120,200 L240,200 L240,260" fill="none" stroke="#1e293b" stroke-width="6" stroke-linecap="round"/>
+    <path d="M120,200 L120,260" fill="none" stroke="#1e293b" stroke-width="6" stroke-linecap="round"/>
+    <!-- Drip emitters -->
+    <circle cx="0" cy="270" r="10" fill="#ea580c"/>
+    <circle cx="120" cy="270" r="10" fill="#ea580c"/>
+    <circle cx="240" cy="270" r="10" fill="#ea580c"/>
+    <text x="120" y="300" fill="#0f172a" font-family="Arial, sans-serif" font-weight="900" font-size="12" text-anchor="middle">BỘ TƯỚI TỰ ĐỘNG BAN CÔNG</text>
+  </g>
+</svg>

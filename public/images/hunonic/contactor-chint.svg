@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <rect width="400" height="400" fill="#f8fafc"/>
+  <g transform="translate(100, 50)">
+    <!-- Contactor Case -->
+    <rect x="0" y="0" width="200" height="300" rx="8" fill="#e2e8f0" stroke="#94a3b8" stroke-width="3"/>
+    <!-- DIN Rail clips top and bottom -->
+    <rect x="50" y="-12" width="100" height="15" rx="3" fill="#cbd5e1"/>
+    <rect x="50" y="297" width="100" height="15" rx="3" fill="#cbd5e1"/>
+    <!-- Top Terminals (L1, L2, L3, NO, A1) -->
+    <rect x="15" y="15" width="170" height="50" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
+    <circle cx="40" cy="40" r="10" fill="#475569"/>
+    <circle cx="80" cy="40" r="10" fill="#475569"/>
+    <circle cx="120" cy="40" r="10" fill="#475569"/>
+    <circle cx="160" cy="40" r="10" fill="#475569"/>
+    <!-- Center Indication Window -->
+    <rect x="30" y="90" width="140" height="120" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+    <text x="100" y="125" fill="#0284c7" font-family="Arial, sans-serif" font-weight="900" font-size="22" text-anchor="middle">CHINT</text>
+    <text x="100" y="150" fill="#0f172a" font-family="Arial, sans-serif" font-weight="bold" font-size="15" text-anchor="middle">NCH8-40 / 25A</text>
+    <text x="100" y="175" fill="#64748b" font-family="Arial, sans-serif" font-weight="bold" font-size="12" text-anchor="middle">Modular Contactor</text>
+    <rect x="80" y="185" width="40" height="12" rx="2" fill="#22c55e"/>
+    <!-- Bottom Terminals -->
+    <rect x="15" y="235" width="170" height="50" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
+    <circle cx="40" cy="260" r="10" fill="#475569"/>
+    <circle cx="80" cy="260" r="10" fill="#475569"/>
+    <circle cx="120" cy="260" r="10" fill="#475569"/>
+    <circle cx="160" cy="260" r="10" fill="#475569"/>
+  </g>
+</svg>

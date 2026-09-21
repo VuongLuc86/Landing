@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <rect width="400" height="400" fill="#f8fafc"/>
+  <!-- MicroSD Card -->
+  <g transform="translate(100, 60)">
+    <!-- Shadow -->
+    <path d="M20,10 L180,10 L180,260 L20,260 Z" fill="#000" opacity="0.12" filter="blur(6px)"/>
+    <!-- Card Shape -->
+    <path d="M30,10 L170,10 C175,10 180,15 180,20 L180,250 C180,255 175,260 170,260 L30,260 C25,260 20,255 20,250 L20,190 L10,180 L10,80 L20,70 L20,20 C20,15 25,10 30,10 Z" fill="#18181b" stroke="#3f3f46" stroke-width="2"/>
+    <!-- Top red stripe for high endurance -->
+    <path d="M20,20 L20,70 L180,70 L180,20 C180,15 175,10 170,10 L30,10 C25,10 20,15 20,20 Z" fill="#dc2626"/>
+    <!-- White brand -->
+    <text x="100" y="45" fill="#ffffff" font-family="Arial, sans-serif" font-weight="900" font-size="18" text-anchor="middle" letter-spacing="1">SanDisk</text>
+    <text x="100" y="62" fill="#fee2e2" font-family="Arial, sans-serif" font-weight="bold" font-size="9" text-anchor="middle">HIGH ENDURANCE</text>
+    <!-- Capacity -->
+    <text x="100" y="125" fill="#ffffff" font-family="Arial, sans-serif" font-weight="900" font-size="36" text-anchor="middle">64<tspan font-size="20">GB</tspan></text>
+    <!-- Speed class badges -->
+    <text x="100" y="155" fill="#e4e4e7" font-family="Arial, sans-serif" font-weight="bold" font-size="12" text-anchor="middle">MicroSDXC™ UHS-I</text>
+    <g transform="translate(60, 175)">
+      <circle cx="15" cy="15" r="13" fill="none" stroke="#e4e4e7" stroke-width="2"/>
+      <text x="15" y="20" fill="#ffffff" font-family="Arial, sans-serif" font-weight="bold" font-size="12" text-anchor="middle">10</text>
+    </g>
+    <g transform="translate(105, 175)">
+      <path d="M5,5 L25,5 L25,25 L5,25 Z" fill="none" stroke="#e4e4e7" stroke-width="2"/>
+      <text x="15" y="20" fill="#ffffff" font-family="Arial, sans-serif" font-weight="bold" font-size="12" text-anchor="middle">U3</text>
+    </g>
+    <text x="100" y="225" fill="#22c55e" font-family="Arial, sans-serif" font-weight="bold" font-size="10" text-anchor="middle">CHUYÊN DÙNG CAMERA 24/7</text>
+  </g>
+</svg>

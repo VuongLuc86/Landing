@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="downlightGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fffbeb"/>
+      <stop offset="60%" stop-color="#fef3c7"/>
+      <stop offset="100%" stop-color="#fde68a"/>
+    </linearGradient>
+    <linearGradient id="metalRing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f1f5f9"/>
+      <stop offset="50%" stop-color="#cbd5e1"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="#f8fafc"/>
+  <g transform="translate(200, 200)">
+    <!-- Outer Mounting Clips -->
+    <rect x="-175" y="-12" width="40" height="24" rx="4" fill="#ea580c"/>
+    <rect x="135" y="-12" width="40" height="24" rx="4" fill="#ea580c"/>
+    <!-- Outer Bezel Ring -->
+    <circle cx="0" cy="0" r="145" fill="url(#metalRing)" stroke="#64748b" stroke-width="2"/>
+    <circle cx="0" cy="0" r="130" fill="#ffffff" stroke="#e2e8f0" stroke-width="3"/>
+    <!-- Diffuser Center with Soft Glow -->
+    <circle cx="0" cy="0" r="105" fill="url(#downlightGlow)" stroke="#fcd34d" stroke-width="2"/>
+    <!-- CCT Color spectrum indicators -->
+    <path d="M-60,35 A70,70 0 0,0 60,35" fill="none" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
+    <!-- Central Brand -->
+    <text x="0" y="-15" fill="#1e293b" font-family="Arial, sans-serif" font-weight="900" font-size="16" text-anchor="middle" letter-spacing="1">HUNONIC</text>
+    <text x="0" y="8" fill="#475569" font-family="Arial, sans-serif" font-weight="bold" font-size="11" text-anchor="middle">SMART DOWNLIGHT</text>
+    <text x="0" y="26" fill="#0284c7" font-family="Arial, sans-serif" font-weight="bold" font-size="10" text-anchor="middle">3000K ~ 6500K RGBCW</text>
+  </g>
+</svg>

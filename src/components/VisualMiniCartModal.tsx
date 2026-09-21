@@ -313,7 +313,7 @@ export const VisualMiniCartModal: React.FC<VisualMiniCartModalProps> = ({ onView
                 </div>
                 <p className="text-sm font-bold text-slate-700">Giỏ hàng của bạn đang trống</p>
                 <p className="text-xs text-slate-500 max-w-xs">
-                  Hãy chọn các thiết bị nhà thông minh Hunonic chính hãng với giá ưu đãi đại lý hôm nay.
+                  Hãy chọn các thiết bị nhà thông minh Hunonic chính hãng với giá ưu đãi trực tiếp hôm nay.
                 </p>
                 <button
                   type="button"
@@ -438,7 +438,7 @@ export const VisualMiniCartModal: React.FC<VisualMiniCartModalProps> = ({ onView
                   </div>
                   {totalSavings > 0 && (
                     <div className="flex justify-between text-emerald-700 font-medium">
-                      <span>Ưu đãi đại lý giảm giá:</span>
+                      <span>Ưu đãi giảm giá trực tiếp:</span>
                       <span>-{totalSavings.toLocaleString('vi-VN')} đ</span>
                     </div>
                   )}

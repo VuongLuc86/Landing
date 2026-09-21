@@ -3,8 +3,8 @@ import { COMPARISON_ROWS } from '../data/mockData';
 
 export const ComparisonTable: React.FC = () => {
   return (
-    <section className="w-full py-16 lg:py-24 bg-[#f2f4f6]" id="bang-so-sanh">
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 flex flex-col gap-12">
+    <section className="w-full py-8 sm:py-12 bg-[#f2f4f6]" id="bang-so-sanh">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 flex flex-col gap-6 sm:gap-8">
         {/* Section Header */}
         <div className="flex flex-col items-center text-center gap-3 max-w-2xl mx-auto">
           <span className="text-xs sm:text-sm text-blue-700 uppercase tracking-widest font-bold">

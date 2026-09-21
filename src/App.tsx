@@ -13,7 +13,6 @@ import { ReviewsAndCommitments } from './components/ReviewsAndCommitments';
 import { FlashSaleBanner } from './components/FlashSaleBanner';
 import { OrderFormSection } from './components/OrderFormSection';
 import { Footer } from './components/Footer';
-import { SmartSwitchSimulator } from './components/SmartSwitchSimulator';
 import { QuickOrderModal, QuickOrderTarget } from './components/QuickOrderModal';
 import { OrdersFileModal } from './components/OrdersFileModal';
 import { SocialProofToast } from './components/SocialProofToast';
@@ -24,7 +23,6 @@ import { CartProvider, useCart } from './context/CartContext';
 import { Product } from './types';
 
 function AppContent() {
-  const [isSimulatorOpen, setIsSimulatorOpen] = useState<boolean>(false);
   const [isQuickOrderOpen, setIsQuickOrderOpen] = useState<boolean>(false);
   const [quickOrderTarget, setQuickOrderTarget] = useState<QuickOrderTarget | null>(null);
   const [isOrdersFileModalOpen, setIsOrdersFileModalOpen] = useState<boolean>(false);
@@ -66,54 +64,21 @@ function AppContent() {
       {/* Top Fixed Navigation */}
       <Navbar
         onOpenOrder={() => handleOpenOrder('switch-luxury')}
-        onOpenSimulator={() => setIsSimulatorOpen(true)}
       />
 
-      {/* Main Content Sections */}
-      <main className="flex-1 pt-28 sm:pt-32">
+      {/* Main Content Sections - Compact & Harmonious spacing */}
+      <main className="flex-1 pt-24 sm:pt-28">
         {/* Section 1: Hero */}
         <HeroSection
           onOpenOrder={() => handleOpenOrder('switch-luxury')}
-          onOpenSimulator={() => setIsSimulatorOpen(true)}
         />
 
         {/* Section 2: Pain Points & Solution */}
         <PainPointsSection />
 
-        {/* Interactive Live Testing Zone */}
-        <section className="w-full py-12 lg:py-16 bg-white border-y border-slate-200" id="trai-nghiem">
-          <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-            <div className="text-center max-w-2xl mx-auto mb-8">
-              <span className="text-xs sm:text-sm text-blue-700 uppercase tracking-widest font-bold flex items-center justify-center gap-1.5">
-                <span className="material-symbols-outlined text-[18px]">touch_app</span>
-                Trải Nghiệm Tương Tác Thực Tế
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-bold font-heading text-slate-900 mt-2">
-                Trải Nghiệm Thử Công Tắc Hunonic Luxury (Phản Hồi 0.1s)
-              </h2>
-              <p className="text-sm text-slate-600 mt-1">
-                Bấm trực tiếp vào các nút cảm ứng bên dưới để kiểm tra tốc độ phản hồi máy chủ Việt Nam
-              </p>
-            </div>
-
-            <SmartSwitchSimulator
-              onSelectForOrder={(config) => {
-                handleOpenOrder({
-                  bundleId: 'switch-luxury',
-                  color: config.color,
-                  gangs: config.gangs,
-                  shape: config.shape,
-                  quantity: config.quantity || 1,
-                });
-              }}
-            />
-          </div>
-        </section>
-
         {/* Section 3: Flagship Products with Mini-Cart & Buy Now Integration */}
         <ProductShowcase
           onSelectProduct={(product) => handleOpenOrder(product)}
-          onOpenSimulator={() => setIsSimulatorOpen(true)}
         />
 
         {/* Section 4: Comparison Table */}
@@ -122,9 +87,9 @@ function AppContent() {
         {/* Section 5: Customer Reviews & Golden Commitments */}
         <ReviewsAndCommitments />
 
-        {/* Section 6: Flash Sale Banner & Combo Packages */}
+        {/* Section 6: Flash Sale Banner & Direct Dealer Benefits */}
         <FlashSaleBanner
-          onSelectCombo={(comboId) => handleOpenOrder(comboId)}
+          onOpenOrder={() => handleOpenOrder('switch-luxury')}
         />
 
         {/* Section 7: Streamlined 3-Field Order Section */}
@@ -140,24 +105,6 @@ function AppContent() {
 
       {/* Footer */}
       <Footer />
-
-      {/* Simulator Modal (when opened from buttons/nav) */}
-      {isSimulatorOpen && (
-        <SmartSwitchSimulator
-          isOpen={true}
-          onClose={() => setIsSimulatorOpen(false)}
-          onSelectForOrder={(config) => {
-            setIsSimulatorOpen(false);
-            handleOpenOrder({
-              bundleId: 'switch-luxury',
-              color: config.color,
-              gangs: config.gangs,
-              shape: config.shape,
-              quantity: config.quantity || 1,
-            });
-          }}
-        />
-      )}
 
       {/* Visual Mini Cart Popup & 3-Field Instant Checkout */}
       <VisualMiniCartModal
@@ -197,7 +144,6 @@ function AppContent() {
           setCheckoutStep('cart');
           setIsCartOpen(true);
         }}
-        onOpenSimulator={() => setIsSimulatorOpen(true)}
       />
     </div>
   );

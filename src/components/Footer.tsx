@@ -53,7 +53,7 @@ export const Footer: React.FC = () => {
               Hỗ Trợ Kỹ Thuật 24/7
             </h4>
             <p className="text-slate-300">
-              <strong>Hotline Đại Lý:</strong>{' '}
+              <strong>Hotline Đặt Hàng:</strong>{' '}
               <a href="tel:0877999663" className="text-blue-400 hover:underline">
                 0877.999.663
               </a>

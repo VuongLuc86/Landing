@@ -3,10 +3,9 @@ import { useCart } from '../context/CartContext';
 
 interface NavbarProps {
   onOpenOrder: (bundleId?: string) => void;
-  onOpenSimulator: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder, onOpenSimulator }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { totalItemsCount, setIsCartOpen, setCheckoutStep } = useCart();
 
@@ -21,10 +20,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder, onOpenSimulator }) 
               Hunonic Chính Hãng
             </span>
             <span className="text-slate-300 font-normal hidden sm:inline text-[12px]">
-              Chiết khấu đại lý đến 20% • Giao hàng miễn phí toàn quốc • Bảo hành 24 tháng 1 đổi 1
+              Ưu đãi trực tiếp đến 20% • Giao hàng miễn phí toàn quốc • Bảo hành 24 tháng 1 đổi 1
             </span>
             <span className="text-slate-300 font-normal sm:hidden text-[12px]">
-              Chiết khấu đến 20% • Freeship toàn quốc
+              Ưu đãi đến 20% • Freeship toàn quốc
             </span>
           </div>
 
@@ -88,20 +87,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder, onOpenSimulator }) 
               className="px-3 py-1.5 text-slate-700 hover:text-blue-700 hover:bg-slate-100/70 rounded-lg transition-colors"
             >
               Giải pháp
-            </a>
-            <a
-              href="#trai-nghiem"
-              onClick={(e) => {
-                // Smooth jump and give simulator focus
-                const el = document.getElementById('trai-nghiem');
-                if (el) {
-                  e.preventDefault();
-                  el.scrollIntoView({ behavior: 'smooth' });
-                }
-              }}
-              className="px-3 py-1.5 text-slate-700 hover:text-blue-700 hover:bg-slate-100/70 rounded-lg transition-colors flex items-center gap-1"
-            >
-              <span>Trải nghiệm</span>
             </a>
             <a
               href="#bang-so-sanh"
@@ -202,19 +187,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder, onOpenSimulator }) 
               <span>Giải pháp</span>
             </a>
             <a
-              href="#trai-nghiem"
-              onClick={() => {
-                setMobileMenuOpen(false);
-                const el = document.getElementById('trai-nghiem');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-                else onOpenSimulator();
-              }}
-              className="px-3 py-2.5 text-blue-700 font-semibold hover:bg-blue-50 rounded-lg flex items-center gap-2.5"
-            >
-              <span className="material-symbols-outlined text-[20px] text-blue-600">touch_app</span>
-              <span>Trải nghiệm thực tế</span>
-            </a>
-            <a
               href="#bang-so-sanh"
               onClick={() => setMobileMenuOpen(false)}
               className="px-3 py-2.5 text-slate-800 font-medium hover:text-blue-700 hover:bg-slate-50 rounded-lg flex items-center gap-2.5"
@@ -255,7 +227,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder, onOpenSimulator }) 
                 className="w-full py-2.5 px-3 rounded-xl bg-[#e04b16] text-white font-bold flex items-center justify-center gap-2 text-sm shadow-sm"
               >
                 <span className="material-symbols-outlined text-[18px]">shopping_cart_checkout</span>
-                <span>Đặt hàng đại lý</span>
+                <span>Đặt hàng chính hãng</span>
               </button>
             </div>
           </div>

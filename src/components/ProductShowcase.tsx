@@ -6,12 +6,10 @@ import { useCart } from '../context/CartContext';
 
 interface ProductShowcaseProps {
   onSelectProduct: (product: Product) => void;
-  onOpenSimulator: () => void;
 }
 
 export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
   onSelectProduct,
-  onOpenSimulator,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('tat-ca');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -45,8 +43,8 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
   const displayedProducts = filteredProducts.slice(0, visibleCount);
 
   return (
-    <section className="w-full py-16 lg:py-24 bg-white" id="san-pham">
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 flex flex-col gap-10">
+    <section className="w-full py-8 sm:py-12 bg-white" id="san-pham">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 flex flex-col gap-6 sm:gap-8">
         {/* Section Header */}
         <div className="flex flex-col items-center text-center gap-3 max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-50 border border-blue-200/60 text-blue-700 text-xs font-bold uppercase tracking-wider">
@@ -54,7 +52,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
             <span>Danh Mục Thiết Bị Chính Hãng Hunonic Việt Nam</span>
           </div>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold font-heading text-slate-900 leading-tight">
-            Sản Phẩm, Thông Số Kỹ Thuật & Giá Bán Ưu Đãi Đại Lý
+            Sản Phẩm, Thông Số Kỹ Thuật & Giá Bán Ưu Đãi Trực Tiếp
           </h2>
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl">
             Tất cả thiết bị được nghiên cứu, lập trình phần mềm và sản xuất 100% tại Việt Nam. Vừa vặn hoàn hảo mọi hộp đế âm tiêu chuẩn chữ nhật Sino, Panasonic & chuẩn vuông EU.
@@ -230,21 +228,6 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
                       </span>
                     ) : (
                       <div />
-                    )}
-
-                    {product.id === 'switch-luxury' && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onOpenSimulator();
-                        }}
-                        className="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-600 hover:text-white text-[11px] font-bold shadow-2xs flex items-center gap-1 transition-colors cursor-pointer shrink-0"
-                        title="Bấm trải nghiệm công tắc cảm ứng 3D"
-                      >
-                        <span className="material-symbols-outlined text-[14px]">touch_app</span>
-                        <span>Bấm thử 3D</span>
-                      </button>
                     )}
                   </div>
 

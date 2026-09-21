@@ -76,7 +76,7 @@ export const TechnicalSpecsModal: React.FC<TechnicalSpecsModalProps> = ({
             {product.promotionNote && (
               <div className="mt-1 text-xs text-amber-800 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200/60 font-medium flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-[15px] text-amber-600">redeem</span>
-                <span>Khuyến mãi đại lý: {product.promotionNote}</span>
+                <span>Khuyến mãi chính hãng: {product.promotionNote}</span>
               </div>
             )}
           </div>

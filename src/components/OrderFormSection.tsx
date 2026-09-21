@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { COMBOS_DATA, PRODUCTS_DATA, PRODUCT_CATEGORIES } from '../data/mockData';
+import { PRODUCTS_DATA, PRODUCT_CATEGORIES } from '../data/mockData';
 import { ProductShape } from '../types';
 import { useCart } from '../context/CartContext';
 import { VIETNAM_PROVINCES } from '../data/vietnamAddressData';
@@ -62,20 +62,6 @@ export const OrderFormSection: React.FC<OrderFormProps> = ({
         image: product.imageUrl,
         fallbackImage: product.fallbackImageUrl,
         isProduct: true,
-      };
-    }
-
-    const combo = COMBOS_DATA.find((c) => c.id === selectedBundle);
-    if (combo) {
-      return {
-        id: combo.id,
-        name: combo.name,
-        price: combo.price,
-        originalPrice: combo.originalPrice,
-        category: 'Gói Combo',
-        image: '/images/hunonic/hunonic-cam-ung.jpg',
-        fallbackImage: '/images/hunonic/hunonic-cam-ung.jpg',
-        isProduct: false,
       };
     }
 
@@ -228,8 +214,8 @@ export const OrderFormSection: React.FC<OrderFormProps> = ({
   };
 
   return (
-    <section className="w-full py-14 lg:py-20 bg-slate-50 border-t border-slate-200" id="dat-hang">
-      <div className="max-w-[1100px] mx-auto px-4 sm:px-6 flex flex-col gap-8">
+    <section className="w-full py-8 sm:py-12 bg-slate-50 border-t border-slate-200" id="dat-hang">
+      <div className="max-w-[1100px] mx-auto px-4 sm:px-6 flex flex-col gap-6 sm:gap-8">
         {/* Section Header - Clean & Simple */}
         <div className="flex flex-col items-center text-center gap-2.5 max-w-2xl mx-auto">
           <div className="flex flex-wrap items-center justify-center gap-2">
@@ -399,13 +385,6 @@ export const OrderFormSection: React.FC<OrderFormProps> = ({
                         </optgroup>
                       );
                     })}
-                    <optgroup label="── Gói Combo Trọn Gói Tiết Kiệm ──">
-                      {COMBOS_DATA.map((c) => (
-                        <option key={c.id} value={c.id}>
-                          {c.name} — {c.price.toLocaleString('vi-VN')}đ (Đã gồm VAT)
-                        </option>
-                      ))}
-                    </optgroup>
                   </select>
 
                   {/* Quantity Stepper */}

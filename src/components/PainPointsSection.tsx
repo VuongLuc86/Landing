@@ -2,8 +2,8 @@ import React from 'react';
 
 export const PainPointsSection: React.FC = () => {
   return (
-    <section className="w-full py-16 lg:py-24 bg-[#f2f4f6]" id="thuc-trang">
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 flex flex-col gap-12">
+    <section className="w-full py-8 sm:py-12 bg-[#f2f4f6]" id="thuc-trang">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 flex flex-col gap-6 sm:gap-8">
         {/* Section Header */}
         <div className="flex flex-col items-center text-center gap-3 max-w-2xl mx-auto">
           <span className="text-xs sm:text-sm text-red-700 uppercase tracking-widest flex items-center gap-1.5 font-bold">

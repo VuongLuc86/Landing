@@ -74,7 +74,7 @@ export const ProductCustomizerModal: React.FC<CustomizerModalProps> = ({
         {product.promotionNote && (
           <div className="text-xs text-amber-800 bg-amber-50 px-3 py-2 rounded-xl border border-amber-200/60 font-medium flex items-center gap-2">
             <span className="material-symbols-outlined text-[18px] text-amber-600 shrink-0">redeem</span>
-            <span>Ưu đãi đại lý: {product.promotionNote}</span>
+            <span>Ưu đãi chính hãng: {product.promotionNote}</span>
           </div>
         )}
 

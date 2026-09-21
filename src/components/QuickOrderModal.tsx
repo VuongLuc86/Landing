@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Product } from '../types';
-import { PRODUCTS_DATA, COMBOS_DATA, PRODUCT_CATEGORIES } from '../data/mockData';
+import { PRODUCTS_DATA, PRODUCT_CATEGORIES } from '../data/mockData';
 import {
   validateVietnamesePhoneNumber,
   validateVietnameseAddress,
@@ -72,17 +72,16 @@ export const QuickOrderModal: React.FC<QuickOrderModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Identify currently selected item (Product or Combo)
-  const currentProduct = PRODUCTS_DATA.find((p) => p.id === selectedItemId);
-  const currentCombo = COMBOS_DATA.find((c) => c.id === selectedItemId);
+  // Identify currently selected product
+  const currentProduct = PRODUCTS_DATA.find((p) => p.id === selectedItemId) || PRODUCTS_DATA[0];
 
-  const itemName = currentProduct?.name || currentCombo?.name || 'Thiết bị thông minh Hunonic';
-  const itemUnitPrice = currentProduct ? currentProduct.price : currentCombo ? currentCombo.price : 490000;
-  const itemOriginalPrice = currentProduct ? currentProduct.originalPrice : currentCombo ? currentCombo.originalPrice : 650000;
-  const itemImage = currentProduct?.imageUrl || '/images/hunonic/hunonic-cam-ung.jpg';
-  const itemFallbackImage = currentProduct?.fallbackImageUrl || '/images/hunonic/hunonic-cam-ung.jpg';
-  const itemWarranty = currentProduct?.warranty || '24 Tháng (1 Đổi 1)';
-  const itemCategory = currentProduct?.category || 'Gói Combo Ưu Đãi';
+  const itemName = currentProduct.name;
+  const itemUnitPrice = currentProduct.price;
+  const itemOriginalPrice = currentProduct.originalPrice;
+  const itemImage = currentProduct.imageUrl || '/images/hunonic/hunonic-cam-ung.jpg';
+  const itemFallbackImage = currentProduct.fallbackImageUrl || '/images/hunonic/hunonic-cam-ung.jpg';
+  const itemWarranty = currentProduct.warranty || '24 Tháng (1 Đổi 1)';
+  const itemCategory = currentProduct.category || 'Thiết bị thông minh Hunonic';
 
   // VAT calculations: Prices are VAT-inclusive
   const totalPrice = itemUnitPrice * quantity;
@@ -382,13 +381,6 @@ export const QuickOrderModal: React.FC<QuickOrderModalProps> = ({
                         </optgroup>
                       );
                     })}
-                    <optgroup label="── Gói Combo Trọn Gói ──">
-                      {COMBOS_DATA.map((c) => (
-                        <option key={c.id} value={c.id}>
-                          {c.name} - {c.price.toLocaleString('vi-VN')}đ (Đã gồm VAT)
-                        </option>
-                      ))}
-                    </optgroup>
                   </select>
 
                   <div className="flex items-baseline gap-2 mt-1">

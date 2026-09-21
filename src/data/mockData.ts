@@ -666,7 +666,7 @@ export const COMPARISON_ROWS: ComparisonRow[] = [
   },
   {
     criteria: 'Giá thành đầu tư',
-    hunonicValue: '✅ Giá đại lý tận xưởng (Chỉ từ 225k)',
+    hunonicValue: '✅ Giá gốc trực tiếp nhà máy (Chỉ từ 225k)',
     hunonicStatus: 'highlight',
     competitorValue: 'Đắt gấp 2.5 – 4 lần qua nhiều tầng trung gian',
     competitorStatus: 'warning',
@@ -677,7 +677,7 @@ export const COMPARISON_ROWS: ComparisonRow[] = [
 export const COMMITMENTS = [
   {
     icon: 'store',
-    title: 'Đại lý chính hãng',
+    title: 'Phân phối chính hãng',
     desc: 'Hỗ trợ lắp đặt tận nhà tại hơn 40 tỉnh thành toàn quốc',
     accentColor: 'text-primary bg-blue-50',
   },
@@ -728,7 +728,7 @@ export const TESTIMONIALS: Testimonial[] = [
     location: 'Lê Chân, Hải Phòng',
     purchasedItems: 'Căn hộ chung cư 3 phòng ngủ',
     quote:
-      'Điều khiển giọng nói phản hồi siêu nhạy, nói qua loa Google tiếng Việt là đèn và điều hòa tự bật tức thì. Nhà mình có con nhỏ nên việc điều khiển khóa an toàn trên app làm mình rất yên tâm. Giá đại lý trực tiếp rẻ hơn rất nhiều so với gói báo giá 30 triệu từ bên ngoài.',
+      'Điều khiển giọng nói phản hồi siêu nhạy, nói qua loa Google tiếng Việt là đèn và điều hòa tự bật tức thì. Nhà mình có con nhỏ nên việc điều khiển khóa an toàn trên app làm mình rất yên tâm. Giá ưu đãi trực tiếp rẻ hơn rất nhiều so với gói báo giá 30 triệu từ bên ngoài.',
     rating: 5,
     verified: true,
   },
@@ -736,7 +736,7 @@ export const TESTIMONIALS: Testimonial[] = [
 
 export const RECENT_ORDERS_TOAST: RecentOrderToastItem[] = [
   { name: 'Anh Lực', location: 'Việt Hòa, Hải Phòng', packageName: 'Bộ Điều Khiển Hồng Ngoại IR', timeAgo: 'Vừa xong' },
-  { name: 'Anh Nam', location: 'Hải Châu, Đà Nẵng', packageName: 'Combo 5 Thiết Bị', timeAgo: '2 phút trước' },
+  { name: 'Anh Nam', location: 'Hải Châu, Đà Nẵng', packageName: 'Bộ 5 Công Tắc Cảm Ứng Luxury', timeAgo: '2 phút trước' },
   { name: 'Chị Thảo', location: 'Quận 1, TP.HCM', packageName: '4 Công Tắc Cảm Ứng Luxury', timeAgo: '3 phút trước' },
   { name: 'Anh Hoàng', location: 'Đống Đa, Hà Nội', packageName: '2 Ổ Cắm SK01 + 1 Bộ IR', timeAgo: '5 phút trước' },
   { name: 'Anh Dũng', location: 'Hồng Bàng, Hải Phòng', packageName: '1 Cảm Biến Khói + 2 Công Tắc', timeAgo: '7 phút trước' },

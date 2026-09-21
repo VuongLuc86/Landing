@@ -3,8 +3,8 @@ import { COMMITMENTS, TESTIMONIALS } from '../data/mockData';
 
 export const ReviewsAndCommitments: React.FC = () => {
   return (
-    <section className="w-full py-16 lg:py-24 bg-white" id="khach-hang">
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 flex flex-col gap-16">
+    <section className="w-full py-8 sm:py-12 bg-white" id="khach-hang">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 flex flex-col gap-6 sm:gap-8">
         {/* Section Header */}
         <div className="flex flex-col items-center text-center gap-3 max-w-2xl mx-auto">
           <div className="inline-flex items-center gap-1 text-amber-500">

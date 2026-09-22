@@ -17,49 +17,100 @@ interface GoogleSheetConfigState {
   configured?: boolean;
 }
 
-const APPS_SCRIPT_TEMPLATE = `function doPost(e) {
+const APPS_SCRIPT_TEMPLATE = `/**
+ * GOOGLE APPS SCRIPT - ĐỒNG BỘ ĐƠN HÀNG TỰ ĐỘNG CHO HUNONIC ĐIỆN 365
+ * Hỗ trợ cả POST và GET - Tự động định dạng bảng và bảo toàn số 0 ở SĐT
+ */
+
+function doGet(e) {
+  if (e && e.parameter && (e.parameter.fullName || e.parameter.phone)) {
+    return handleOrderRecord(e.parameter);
+  }
+  return ContentService.createTextOutput(JSON.stringify({
+    status: "success",
+    message: "Webhook Google Sheet Điện 365 Hunonic hoạt động bình thường! Sẵn sàng nhận đơn hàng."
+  })).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  try {
+    var data = {};
+    if (e && e.postData && e.postData.contents) {
+      try {
+        data = JSON.parse(e.postData.contents);
+      } catch (err) {
+        data = e.parameter || {};
+      }
+    } else if (e && e.parameter) {
+      data = e.parameter;
+    }
+    return handleOrderRecord(data);
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "error",
+      message: err.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function handleOrderRecord(data) {
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = ss.getActiveSheet();
 
-    // Tự động tạo dòng tiêu đề chuẩn nếu trang tính chưa có dữ liệu
+    // 1. Tự động tạo dòng tiêu đề nếu bảng tính còn trống
     if (sheet.getLastRow() === 0) {
       sheet.appendRow([
         "STT",
-        "Họ tên",
+        "Họ tên khách hàng",
         "Số điện thoại",
         "Địa chỉ giao hàng",
-        "Sản phẩm mua",
+        "Sản phẩm đặt mua",
         "Ngày đặt hàng",
-        "Số tiền thanh toán",
+        "Tổng tiền (VNĐ)",
         "Ghi chú",
-        "Thời gian ghi nhận"
+        "Thời gian ghi nhận hệ thống"
       ]);
-      sheet.getRange(1, 1, 1, 9).setFontWeight("bold").setBackground("#dbeafe");
+      var headerRange = sheet.getRange(1, 1, 1, 9);
+      headerRange.setBackground("#1e40af");
+      headerRange.setFontColor("#ffffff");
+      headerRange.setFontWeight("bold");
+      headerRange.setHorizontalAlignment("center");
       sheet.setFrozenRows(1);
     }
 
-    var data = JSON.parse(e.postData.contents);
-
     var nextStt = sheet.getLastRow();
     var sttVal = data.stt || nextStt;
-    var phoneStr = "'" + String(data.phone || "");
+    var rawPhone = String(data.phone || "").trim();
+    var phone = rawPhone;
+    if (rawPhone && !rawPhone.startsWith("'")) {
+      phone = "'" + rawPhone;
+    }
+
+    var amountVal = Number(data.amount) || 0;
 
     sheet.appendRow([
       sttVal,
       data.fullName || "",
-      phoneStr,
+      phone,
       data.address || "",
       data.productName || "",
       data.orderDate || "",
-      data.amount || 0,
+      amountVal,
       data.note || "",
       new Date().toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })
     ]);
 
+    var lastRow = sheet.getLastRow();
+    sheet.getRange(lastRow, 7).setNumberFormat("#,##0\" đ\"");
+    sheet.getRange(lastRow, 1).setHorizontalAlignment("center");
+    sheet.getRange(lastRow, 3).setHorizontalAlignment("center");
+    sheet.getRange(lastRow, 6).setHorizontalAlignment("center");
+
     return ContentService.createTextOutput(JSON.stringify({
       status: "success",
-      message: "Đã thêm đơn hàng vào Google Sheet thành công"
+      message: "Đã thêm đơn hàng #" + sttVal + " vào Google Sheet thành công",
+      row: lastRow
     })).setMimeType(ContentService.MimeType.JSON);
   } catch (err) {
     return ContentService.createTextOutput(JSON.stringify({
@@ -67,7 +118,7 @@ const APPS_SCRIPT_TEMPLATE = `function doPost(e) {
       message: err.toString()
     })).setMimeType(ContentService.MimeType.JSON);
   }
-}`;
+};`;
 
 export const OrdersFileModal: React.FC<OrdersFileModalProps> = ({
   isOpen,
@@ -468,7 +519,9 @@ export const OrdersFileModal: React.FC<OrdersFileModalProps> = ({
               {/* Status Alert Box */}
               <div
                 className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
-                  sheetConfig.configured
+                  sheetConfig.lastSyncStatus === 'error'
+                    ? 'bg-rose-50 border-rose-200 text-rose-900'
+                    : sheetConfig.configured
                     ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
                     : 'bg-amber-50 border-amber-200 text-amber-900'
                 }`}
@@ -476,27 +529,45 @@ export const OrdersFileModal: React.FC<OrdersFileModalProps> = ({
                 <div className="flex items-start gap-3">
                   <div
                     className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-                      sheetConfig.configured ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                      sheetConfig.lastSyncStatus === 'error'
+                        ? 'bg-rose-100 text-rose-700'
+                        : sheetConfig.configured
+                        ? 'bg-emerald-100 text-emerald-700'
+                        : 'bg-amber-100 text-amber-700'
                     }`}
                   >
                     <span className="material-symbols-outlined text-[20px]">
-                      {sheetConfig.configured ? 'cloud_done' : 'cloud_sync'}
+                      {sheetConfig.lastSyncStatus === 'error'
+                        ? 'error'
+                        : sheetConfig.configured
+                        ? 'cloud_done'
+                        : 'cloud_sync'}
                     </span>
                   </div>
                   <div>
                     <h4 className="text-sm font-bold">
-                      {sheetConfig.configured
+                      {sheetConfig.lastSyncStatus === 'error'
+                        ? 'Cần Cập Nhật Bản Triển Khai Trong Google Apps Script'
+                        : sheetConfig.configured
                         ? 'Hệ Thống Đã Được Kết Nối Với Google Sheet'
                         : 'Chưa Cấu Hình Webhook Tự Động Cho Google Sheet'}
                     </h4>
                     <p className="text-xs mt-0.5 opacity-90">
-                      {sheetConfig.configured
+                      {sheetConfig.lastSyncStatus === 'error'
+                        ? 'Google Apps Script chưa nhận được hàm ghi đơn (doPost). Vui lòng xem hướng dẫn cập nhật bản triển khai bên dưới.'
+                        : sheetConfig.configured
                         ? 'Mỗi khi khách hàng bấm Đặt Hàng trên website, thông tin sẽ được đẩy ngay lập tức vào Trang tính Google Sheet của bạn.'
                         : 'Để đơn hàng tự động cập nhật vào Google Sheet, vui lòng làm theo hướng dẫn 3 bước đơn giản bên dưới để lấy Webhook URL.'}
                     </p>
                     {sheetConfig.lastSyncTime && (
-                      <p className="text-[11px] mt-1 font-medium text-slate-600">
-                        Lần đồng bộ gần nhất: <strong>{sheetConfig.lastSyncTime}</strong> — {sheetConfig.lastSyncMessage}
+                      <p
+                        className={`text-[11px] mt-1 font-medium ${
+                          sheetConfig.lastSyncStatus === 'error'
+                            ? 'text-rose-700 font-semibold'
+                            : 'text-slate-600'
+                        }`}
+                      >
+                        Lần kiểm tra gần nhất: <strong>{sheetConfig.lastSyncTime}</strong> — {sheetConfig.lastSyncMessage}
                       </p>
                     )}
                   </div>
@@ -659,9 +730,9 @@ export const OrdersFileModal: React.FC<OrdersFileModalProps> = ({
                     <div className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs">
                       2
                     </div>
-                    <strong className="text-slate-900 font-semibold">Dán Mã Code & Triển Khai</strong>
+                    <strong className="text-slate-900 font-semibold">Dán Mã Code & Lưu</strong>
                     <p>
-                      Xóa hết mã cũ trong file <code className="font-mono bg-slate-200 px-1 py-0.2 rounded">Code.gs</code>, dán đoạn mã bên dưới vào &rarr; bấm <strong>Lưu (Ctrl+S)</strong>.
+                      Xóa sạch toàn bộ chữ cũ trong file <code className="font-mono bg-slate-200 px-1 py-0.2 rounded">Code.gs</code>, dán toàn bộ đoạn mã bên dưới vào &rarr; bấm biểu tượng <strong>💾 Lưu dự án (Ctrl+S)</strong>.
                     </p>
                   </div>
 
@@ -669,9 +740,20 @@ export const OrdersFileModal: React.FC<OrdersFileModalProps> = ({
                     <div className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs">
                       3
                     </div>
-                    <strong className="text-slate-900 font-semibold">Xuất Bản & Dán Link Webhook</strong>
+                    <strong className="text-slate-900 font-semibold">Triển Khai & Lấy URL Webhook</strong>
                     <p>
-                      Bấm nút <strong>Triển khai (Deploy)</strong> &rarr; <strong>Tùy chọn triển khai mới</strong> &rarr; Chọn loại: <strong>Ứng dụng web (Web app)</strong> &rarr; Ai có quyền truy cập: chọn <strong>Bất kỳ ai (Anyone)</strong> &rarr; Copy link URL và dán vào ô bên trên!
+                      Bấm nút <strong>Triển khai (Deploy)</strong> &rarr; <strong>Tùy chọn triển khai mới</strong> &rarr; Loại: <strong>Ứng dụng web (Web app)</strong> &rarr; Ai có quyền truy cập: chọn <strong>Bất kỳ ai (Anyone)</strong> &rarr; Bấm <strong>Triển khai</strong> &rarr; Sao chép link URL kết thúc bằng <code className="font-mono bg-slate-200 px-1 py-0.2 rounded">/exec</code> dán vào ô trên!
+                    </p>
+                  </div>
+                </div>
+
+                {/* Important notice for existing deployments */}
+                <div className="p-3.5 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 flex items-start gap-2.5">
+                  <span className="material-symbols-outlined text-amber-600 text-[20px] shrink-0 mt-0.5">warning</span>
+                  <div className="flex flex-col gap-1">
+                    <span className="font-bold text-amber-950">Lưu ý cực kỳ quan trọng nếu bạn đã từng bấm "Triển khai" trước đó:</span>
+                    <p className="leading-relaxed">
+                      Trong Google Apps Script, nếu bạn đã bấm Triển khai từ trước, việc sửa hay dán code mới sẽ <strong>chưa có hiệu lực ngay</strong>. Để Google cập nhật mã mới, bạn hãy bấm: <strong>Triển khai (Deploy) &rarr; Quản lý bản triển khai (Manage deployments) &rarr; Bấm biểu tượng cây bút Chỉnh sửa &rarr; Ở mục Phiên bản chọn "Phiên bản mới" (New version) &rarr; Bấm Triển khai</strong>. Hoặc đơn giản nhất là bấm <strong>"Tùy chọn triển khai mới"</strong> để lấy URL mới và dán vào ô Webhook.
                     </p>
                   </div>
                 </div>

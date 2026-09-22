@@ -169,7 +169,7 @@ async function sendOrderToGoogleSheet(order: OrderItem, config?: GoogleSheetConf
     };
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
 
     const res = await fetch(webhook, {
       method: 'POST',
@@ -182,16 +182,62 @@ async function sendOrderToGoogleSheet(order: OrderItem, config?: GoogleSheetConf
     });
     clearTimeout(timeoutId);
 
-    if (res.ok) {
+    const responseText = await res.text().catch(() => '');
+
+    // Check for Google Apps Script specific error pages (which return HTTP 200 with HTML)
+    if (responseText.includes('Script function not found: doPost') || responseText.includes('Script function not found: doGet')) {
+      const errMsg = 'Google Apps Script báo lỗi: "Script function not found: doPost". NGUYÊN NHÂN: Trong trang Apps Script, bạn chưa tạo Bản Triển Khai Mới sau khi dán mã. Vui lòng bấm: Triển khai -> Quản lý bản triển khai -> Sửa -> Chọn "Phiên bản mới" -> Triển khai.';
+      saveGoogleSheetConfig({
+        lastSyncTime: new Date().toLocaleString('vi-VN'),
+        lastSyncStatus: 'error',
+        lastSyncMessage: errMsg,
+      });
+      return { success: false, message: errMsg };
+    }
+
+    if (responseText.includes('<title>Error</title>') || responseText.includes('Script function not found') || responseText.includes('Google Docs encountered an error')) {
+      const errMsg = `Google Apps Script gặp lỗi khi xử lý: ${responseText.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 180)}`;
+      saveGoogleSheetConfig({
+        lastSyncTime: new Date().toLocaleString('vi-VN'),
+        lastSyncStatus: 'error',
+        lastSyncMessage: errMsg,
+      });
+      return { success: false, message: errMsg };
+    }
+
+    // Try parsing JSON response from our standard doPost function
+    let isSuccess = false;
+    let successMessage = `Đã đồng bộ đơn hàng #${order.stt} (${order.fullName}) thành công`;
+    try {
+      const json = JSON.parse(responseText);
+      if (json.status === 'success' || json.result === 'success') {
+        isSuccess = true;
+        if (json.message) successMessage = json.message;
+      } else if (json.status === 'error') {
+        const errMsg = `Google Apps Script báo lỗi: ${json.message || 'Lỗi không xác định'}`;
+        saveGoogleSheetConfig({
+          lastSyncTime: new Date().toLocaleString('vi-VN'),
+          lastSyncStatus: 'error',
+          lastSyncMessage: errMsg,
+        });
+        return { success: false, message: errMsg };
+      }
+    } catch {
+      // If response is not JSON, check if HTTP is OK and response does not contain error keywords
+      if (res.ok && !responseText.toLowerCase().includes('error')) {
+        isSuccess = true;
+      }
+    }
+
+    if (isSuccess) {
       saveGoogleSheetConfig({
         lastSyncTime: new Date().toLocaleString('vi-VN'),
         lastSyncStatus: 'success',
-        lastSyncMessage: `Đã đồng bộ đơn hàng #${order.stt} (${order.fullName}) thành công`,
+        lastSyncMessage: successMessage,
       });
-      return { success: true, message: 'Đã cập nhật đơn hàng vào Google Sheet thành công' };
+      return { success: true, message: successMessage };
     } else {
-      const errText = await res.text().catch(() => '');
-      const errMsg = `Google Sheet trả về mã lỗi HTTP ${res.status}: ${errText.slice(0, 100)}`;
+      const errMsg = `Phản hồi không hợp lệ từ Google Sheet (HTTP ${res.status}): ${responseText.slice(0, 150)}`;
       saveGoogleSheetConfig({
         lastSyncTime: new Date().toLocaleString('vi-VN'),
         lastSyncStatus: 'error',
@@ -200,7 +246,7 @@ async function sendOrderToGoogleSheet(order: OrderItem, config?: GoogleSheetConf
       return { success: false, message: errMsg };
     }
   } catch (err: any) {
-    const errMsg = err?.name === 'AbortError' ? 'Hết thời gian chờ kết nối Google Sheet (Timeout 10s)' : (err?.message || 'Lỗi mạng khi kết nối Google Sheet');
+    const errMsg = err?.name === 'AbortError' ? 'Hết thời gian chờ kết nối Google Sheet (Timeout 12s)' : (err?.message || 'Lỗi mạng khi kết nối Google Sheet');
     saveGoogleSheetConfig({
       lastSyncTime: new Date().toLocaleString('vi-VN'),
       lastSyncStatus: 'error',

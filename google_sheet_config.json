@@ -1,0 +1,8 @@
+{
+  "webhookUrl": "https://script.google.com/macros/s/AKfycbzEcmUrp8DXlnBBmGHenoTvO0x5ZYdH9BmJyvop-aOfRhmI2N8UpJ4oR7hIosynGPp6/exec",
+  "sheetUrl": "https://docs.google.com/spreadsheets/d/1WcpdLNXtG7ROuSXIiHv1dWK8EAdyvu4eBQwfqhLALRs/edit?usp=drive_link",
+  "autoSync": true,
+  "lastSyncTime": "16:02:54 22/9/2026",
+  "lastSyncStatus": "error",
+  "lastSyncMessage": "Google Apps Script báo lỗi: \"Script function not found: doPost\". NGUYÊN NHÂN: Trong trang Apps Script, bạn chưa tạo Bản Triển Khai Mới sau khi dán mã. Vui lòng bấm: Triển khai -> Quản lý bản triển khai -> Sửa -> Chọn \"Phiên bản mới\" -> Triển khai."
+}

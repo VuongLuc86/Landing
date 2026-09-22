@@ -3,9 +3,10 @@ import { useCart } from '../context/CartContext';
 
 interface NavbarProps {
   onOpenOrder: (bundleId?: string) => void;
+  onOpenOrdersFileModal?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder, onOpenOrdersFileModal }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { totalItemsCount, setIsCartOpen, setCheckoutStep } = useCart();
 
@@ -20,14 +21,25 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder }) => {
               Hunonic Chính Hãng
             </span>
             <span className="text-slate-300 font-normal hidden sm:inline text-[12px]">
-              Ưu đãi trực tiếp đến 20% • Giao hàng miễn phí toàn quốc • Bảo hành 24 tháng 1 đổi 1
+              Ưu đãi trực tiếp đến 28% • Giao hàng miễn phí toàn quốc • Bảo hành 24 tháng 1 đổi 1
             </span>
             <span className="text-slate-300 font-normal sm:hidden text-[12px]">
-              Ưu đãi đến 20% • Freeship toàn quốc
+              Ưu đãi đến 28% • Freeship toàn quốc
             </span>
           </div>
 
-          <div className="flex items-center gap-3 sm:gap-4 text-xs shrink-0 font-medium">
+          <div className="flex items-center gap-2.5 sm:gap-4 text-xs shrink-0 font-medium">
+            {onOpenOrdersFileModal && (
+              <button
+                type="button"
+                onClick={onOpenOrdersFileModal}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 text-[11px] font-semibold transition-colors cursor-pointer"
+                title="Xem đơn hàng & Đồng bộ Google Sheet"
+              >
+                <span className="material-symbols-outlined text-[13px]">sync_alt</span>
+                <span>Đơn hàng & Google Sheet</span>
+              </button>
+            )}
             <a
               href="tel:0877999663"
               className="inline-flex items-center gap-1.5 text-slate-300 hover:text-white transition-colors"
@@ -52,7 +64,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder }) => {
           <a href="#" className="flex items-center gap-3 shrink-0 group">
             <img
               src="/images/hunonic/logo-hunonic-ngang.png"
-              alt="Điện 365 Đại lý chính thức của HUNONIC"
+              alt="Điện 365 Phân phối chính hãng HUNONIC"
               className="h-7 sm:h-8 w-auto object-contain group-hover:opacity-90 transition-opacity"
               onError={(e) => {
                 e.currentTarget.src = 'https://hunonic.com/wp-content/uploads/2024/05/logo-hunonic-ngang-1-1.png';
@@ -63,7 +75,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder }) => {
                 Điện 365
               </span>
               <span className="text-[11px] text-blue-700 font-semibold tracking-wide uppercase">
-                Đại lý chính thức HUNONIC
+                Phân phối chính hãng HUNONIC
               </span>
             </div>
           </a>
@@ -212,6 +224,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder }) => {
             </a>
 
             <div className="mt-3 pt-3 border-t border-slate-100 flex flex-col gap-2">
+              {onOpenOrdersFileModal && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenOrdersFileModal();
+                  }}
+                  className="w-full py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center gap-2 border border-emerald-200 text-sm transition-colors cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-[18px]">sync_alt</span>
+                  <span>Quản lý đơn & Google Sheet</span>
+                </button>
+              )}
               <a
                 href="tel:0877999663"
                 className="w-full py-2.5 px-3 rounded-xl bg-slate-50 text-slate-800 font-semibold flex items-center justify-center gap-2 border border-slate-200 text-sm"

@@ -10,7 +10,7 @@ export const Footer: React.FC = () => {
             <div className="flex items-center gap-3">
               <img
                 src="https://hunonic.com/wp-content/uploads/2024/05/logo-hunonic-ngang-1-1.png"
-                alt="Điện 365 Đại lý chính thức của HUNONIC"
+                alt="Điện 365 Phân phối chính hãng HUNONIC"
                 className="h-8 w-auto object-contain brightness-0 invert"
                 referrerPolicy="no-referrer"
                 onError={(e) => {
@@ -19,7 +19,7 @@ export const Footer: React.FC = () => {
               />
               <div className="flex flex-col border-l border-slate-700 pl-3">
                 <span className="text-sm font-black font-heading text-white">Điện 365</span>
-                <span className="text-[11px] text-blue-400 font-bold uppercase">Đại Lý Chính Thức HUNONIC</span>
+                <span className="text-[11px] text-blue-400 font-bold uppercase">Phân Phối Chính Hãng HUNONIC</span>
               </div>
             </div>
             <p className="text-xs leading-relaxed text-slate-400">
@@ -96,7 +96,7 @@ export const Footer: React.FC = () => {
 
         {/* Bottom bar */}
         <div className="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© 2026 Điện 365 — Đại lý chính thức của HUNONIC Việt Nam. Nhà thông minh của người Việt.</p>
+          <p>© 2026 Điện 365 — Phân phối chính hãng HUNONIC Việt Nam. Nhà thông minh của người Việt.</p>
           <div className="flex items-center gap-4">
             <span className="hover:text-slate-400 transition-colors cursor-pointer">Chính sách bảo hành</span>
             <span>•</span>

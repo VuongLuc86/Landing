@@ -9,6 +9,47 @@ const PORT = 3000;
 app.use(express.json());
 
 const CSV_FILE_PATH = path.join(process.cwd(), 'orders.csv');
+const GOOGLE_SHEET_CONFIG_PATH = path.join(process.cwd(), 'google_sheet_config.json');
+
+interface GoogleSheetConfig {
+  webhookUrl: string;
+  sheetUrl: string;
+  autoSync: boolean;
+  lastSyncTime?: string;
+  lastSyncStatus?: 'success' | 'error' | 'none';
+  lastSyncMessage?: string;
+}
+
+function getGoogleSheetConfig(): GoogleSheetConfig {
+  try {
+    if (fs.existsSync(GOOGLE_SHEET_CONFIG_PATH)) {
+      const data = JSON.parse(fs.readFileSync(GOOGLE_SHEET_CONFIG_PATH, 'utf-8'));
+      return {
+        webhookUrl: process.env.GOOGLE_SHEET_WEBHOOK_URL || data.webhookUrl || '',
+        sheetUrl: process.env.GOOGLE_SHEET_URL || data.sheetUrl || '',
+        autoSync: data.autoSync ?? true,
+        lastSyncTime: data.lastSyncTime || undefined,
+        lastSyncStatus: data.lastSyncStatus || 'none',
+        lastSyncMessage: data.lastSyncMessage || '',
+      };
+    }
+  } catch (e) {
+    console.error('Error reading google sheet config:', e);
+  }
+  return {
+    webhookUrl: process.env.GOOGLE_SHEET_WEBHOOK_URL || '',
+    sheetUrl: process.env.GOOGLE_SHEET_URL || '',
+    autoSync: true,
+    lastSyncStatus: 'none',
+  };
+}
+
+function saveGoogleSheetConfig(newConfig: Partial<GoogleSheetConfig>): GoogleSheetConfig {
+  const current = getGoogleSheetConfig();
+  const updated: GoogleSheetConfig = { ...current, ...newConfig };
+  fs.writeFileSync(GOOGLE_SHEET_CONFIG_PATH, JSON.stringify(updated, null, 2), 'utf-8');
+  return updated;
+}
 
 // Helper to escape CSV field
 function escapeCsvField(val: string | number | undefined | null): string {
@@ -105,6 +146,70 @@ function parseCsvOrders(): { orders: OrderItem[]; total: number } {
   return { orders, total };
 }
 
+async function sendOrderToGoogleSheet(order: OrderItem, config?: GoogleSheetConfig): Promise<{ success: boolean; message: string }> {
+  const cfg = config || getGoogleSheetConfig();
+  const webhook = (cfg.webhookUrl || process.env.GOOGLE_SHEET_WEBHOOK_URL || '').trim();
+
+  if (!webhook) {
+    return { success: false, message: 'Chưa cấu hình URL Webhook Google Sheet' };
+  }
+
+  try {
+    const payload = {
+      stt: order.stt,
+      fullName: order.fullName,
+      phone: order.phone,
+      address: order.address,
+      productName: order.productName,
+      orderDate: order.orderDate,
+      amount: order.amount,
+      note: order.note || '',
+      source: 'Website Dien365 Hunonic D2C',
+      createdAt: new Date().toISOString(),
+    };
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    const res = await fetch(webhook, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+      redirect: 'follow',
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      saveGoogleSheetConfig({
+        lastSyncTime: new Date().toLocaleString('vi-VN'),
+        lastSyncStatus: 'success',
+        lastSyncMessage: `Đã đồng bộ đơn hàng #${order.stt} (${order.fullName}) thành công`,
+      });
+      return { success: true, message: 'Đã cập nhật đơn hàng vào Google Sheet thành công' };
+    } else {
+      const errText = await res.text().catch(() => '');
+      const errMsg = `Google Sheet trả về mã lỗi HTTP ${res.status}: ${errText.slice(0, 100)}`;
+      saveGoogleSheetConfig({
+        lastSyncTime: new Date().toLocaleString('vi-VN'),
+        lastSyncStatus: 'error',
+        lastSyncMessage: errMsg,
+      });
+      return { success: false, message: errMsg };
+    }
+  } catch (err: any) {
+    const errMsg = err?.name === 'AbortError' ? 'Hết thời gian chờ kết nối Google Sheet (Timeout 10s)' : (err?.message || 'Lỗi mạng khi kết nối Google Sheet');
+    saveGoogleSheetConfig({
+      lastSyncTime: new Date().toLocaleString('vi-VN'),
+      lastSyncStatus: 'error',
+      lastSyncMessage: errMsg,
+    });
+    return { success: false, message: errMsg };
+  }
+}
+
 // API Routes
 app.get('/api/orders', (req, res) => {
   try {
@@ -118,7 +223,7 @@ app.get('/api/orders', (req, res) => {
   }
 });
 
-app.post('/api/orders', (req, res) => {
+app.post('/api/orders', async (req, res) => {
   try {
     ensureCsvFile();
     const { fullName, phone, address, productName, amount, note, orderDate } = req.body;
@@ -163,16 +268,139 @@ app.post('/api/orders', (req, res) => {
 
     fs.writeFileSync(CSV_FILE_PATH, csvContent, 'utf-8');
 
+    // Asynchronously dispatch to Google Sheet if configured
+    let googleSheetSync = { success: false, message: 'Chưa cấu hình Google Sheet' };
+    const sheetConfig = getGoogleSheetConfig();
+    if (sheetConfig.autoSync && sheetConfig.webhookUrl) {
+      googleSheetSync = await sendOrderToGoogleSheet(newOrder, sheetConfig);
+    }
+
     res.json({
       success: true,
-      message: 'Cập nhật thông tin đơn hàng vào file thành công',
+      message: 'Cập nhật thông tin đơn hàng thành công',
       order: newOrder,
       totalOrders: updatedOrders.length,
       totalAmount: newTotal,
+      googleSheetSync,
     });
   } catch (err) {
     console.error('Error saving order to file:', err);
     res.status(500).json({ success: false, message: 'Lỗi khi lưu đơn hàng vào file' });
+  }
+});
+
+// Google Sheet Configuration and Synchronization Endpoints
+app.get('/api/google-sheet/config', (req, res) => {
+  try {
+    const config = getGoogleSheetConfig();
+    res.json({
+      success: true,
+      config: {
+        ...config,
+        configured: Boolean(config.webhookUrl),
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Không thể đọc cấu hình Google Sheet' });
+  }
+});
+
+app.post('/api/google-sheet/config', (req, res) => {
+  try {
+    const { webhookUrl, sheetUrl, autoSync } = req.body;
+    const updated = saveGoogleSheetConfig({
+      webhookUrl: typeof webhookUrl === 'string' ? webhookUrl.trim() : undefined,
+      sheetUrl: typeof sheetUrl === 'string' ? sheetUrl.trim() : undefined,
+      autoSync: typeof autoSync === 'boolean' ? autoSync : undefined,
+    });
+    res.json({
+      success: true,
+      message: 'Đã lưu cấu hình Google Sheet thành công',
+      config: {
+        ...updated,
+        configured: Boolean(updated.webhookUrl),
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Lỗi khi lưu cấu hình Google Sheet' });
+  }
+});
+
+app.post('/api/google-sheet/test', async (req, res) => {
+  try {
+    const { webhookUrl } = req.body;
+    const targetWebhook = (webhookUrl || getGoogleSheetConfig().webhookUrl || '').trim();
+    if (!targetWebhook) {
+      res.status(400).json({ success: false, message: 'Vui lòng cung cấp URL Webhook Google Sheet' });
+      return;
+    }
+
+    const testOrder: OrderItem = {
+      stt: 999,
+      fullName: 'Khách hàng thử nghiệm',
+      phone: '0877999663',
+      address: 'Kiểm tra đồng bộ Google Sheet',
+      productName: 'Công Tắc Thông Minh Hunonic Luxury (Test)',
+      orderDate: new Date().toLocaleDateString('vi-VN'),
+      amount: 730000,
+      note: 'Dữ liệu kiểm tra kết nối từ website Dien365 Hunonic',
+    };
+
+    const result = await sendOrderToGoogleSheet(testOrder, {
+      webhookUrl: targetWebhook,
+      sheetUrl: '',
+      autoSync: true,
+    });
+
+    if (result.success) {
+      res.json({
+        success: true,
+        message: 'Kết nối Google Sheet thành công! Dòng thử nghiệm đã được ghi vào Trang tính của bạn.',
+      });
+    } else {
+      res.status(400).json({ success: false, message: result.message });
+    }
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err?.message || 'Lỗi khi kiểm tra kết nối' });
+  }
+});
+
+app.post('/api/google-sheet/sync-all', async (req, res) => {
+  try {
+    const config = getGoogleSheetConfig();
+    if (!config.webhookUrl) {
+      res.status(400).json({
+        success: false,
+        message: 'Chưa cấu hình URL Webhook Google Sheet. Vui lòng dán link Webhook vào trước khi đồng bộ.',
+      });
+      return;
+    }
+
+    const { orders } = parseCsvOrders();
+    if (orders.length === 0) {
+      res.json({ success: true, message: 'Không có đơn hàng nào để đồng bộ', syncedCount: 0 });
+      return;
+    }
+
+    let synced = 0;
+    let failed = 0;
+
+    for (const order of orders) {
+      const result = await sendOrderToGoogleSheet(order, config);
+      if (result.success) synced++;
+      else failed++;
+      // Wait 300ms between requests to avoid script rate-limiting
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    }
+
+    res.json({
+      success: true,
+      message: `Đã đồng bộ ${synced}/${orders.length} đơn hàng sang Google Sheet!`,
+      syncedCount: synced,
+      failedCount: failed,
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err?.message || 'Lỗi trong quá trình đồng bộ hàng loạt' });
   }
 });
 

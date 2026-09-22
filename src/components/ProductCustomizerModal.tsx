@@ -29,9 +29,42 @@ export const ProductCustomizerModal: React.FC<CustomizerModalProps> = ({
   const hasShapeOptions = !!product.options?.shapes;
   const hasColorOptions = !!product.options?.colors;
 
+  // Determine current unit price and original price based on selected gang if applicable
+  const getGangedPrices = () => {
+    if (product.id === 'switch-luxury' && hasGangOptions) {
+      // Official Hunonic Luxury prices: 1 gang: 730k (895k), 2 gangs: 765k (920k), 3 gangs: 795k (950k), 4 gangs: 825k (980k)
+      const gangMap: Record<number, { price: number; originalPrice: number }> = {
+        1: { price: 730000, originalPrice: 895000 },
+        2: { price: 765000, originalPrice: 920000 },
+        3: { price: 795000, originalPrice: 950000 },
+        4: { price: 825000, originalPrice: 980000 },
+      };
+      return gangMap[gangs] || { price: product.price, originalPrice: product.originalPrice };
+    }
+    if (product.id === 'switch-smech' && hasGangOptions) {
+      // Official Hunonic Smech: 1 gang: 460k, 2 gangs: 485k, 3 gangs: 520k, 4 gangs: 550k
+      const gangMap: Record<number, { price: number; originalPrice: number }> = {
+        1: { price: 460000, originalPrice: 550000 },
+        2: { price: 485000, originalPrice: 580000 },
+        3: { price: 520000, originalPrice: 620000 },
+        4: { price: 550000, originalPrice: 650000 },
+      };
+      return gangMap[gangs] || { price: product.price, originalPrice: product.originalPrice };
+    }
+    return { price: product.price, originalPrice: product.originalPrice };
+  };
+
+  const { price: currentUnitPrice, originalPrice: currentUnitOriginalPrice } = getGangedPrices();
+  const currentDiscountPercent = Math.round(((currentUnitOriginalPrice - currentUnitPrice) / currentUnitOriginalPrice) * 100);
+
   const handleOrder = () => {
     onProceedOrder({
-      product,
+      product: {
+        ...product,
+        price: currentUnitPrice,
+        originalPrice: currentUnitOriginalPrice,
+        discountPercent: currentDiscountPercent,
+      },
       shape: shape === 'rectangular' ? 'Chữ nhật (120x72mm)' : 'Vuông (86x86mm)',
       gangs: hasGangOptions ? gangs : undefined,
       color: hasColorOptions ? (color === 'champagne' ? 'Vàng Champagne' : 'Đen Titan') : undefined,
@@ -97,14 +130,14 @@ export const ProductCustomizerModal: React.FC<CustomizerModalProps> = ({
             <div className="mt-3 text-center">
               <div className="flex items-baseline justify-center gap-2">
                 <span className="text-xl sm:text-2xl font-extrabold text-[#e04b16] font-heading">
-                  {(product.price * quantity).toLocaleString('vi-VN')}đ
+                  {(currentUnitPrice * quantity).toLocaleString('vi-VN')}đ
                 </span>
                 <span className="text-xs text-slate-400 line-through">
-                  {(product.originalPrice * quantity).toLocaleString('vi-VN')}đ
+                  {(currentUnitOriginalPrice * quantity).toLocaleString('vi-VN')}đ
                 </span>
               </div>
               <span className="inline-block mt-1 text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-                Tiết kiệm {((product.originalPrice - product.price) * quantity).toLocaleString('vi-VN')}đ (-{product.discountPercent}%)
+                Tiết kiệm {((currentUnitOriginalPrice - currentUnitPrice) * quantity).toLocaleString('vi-VN')}đ (-{currentDiscountPercent}%)
               </span>
             </div>
           </div>
@@ -114,24 +147,44 @@ export const ProductCustomizerModal: React.FC<CustomizerModalProps> = ({
             {/* Gangs selector */}
             {hasGangOptions && (
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">
-                  Số nút cảm ứng:
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5 flex items-center justify-between">
+                  <span>Số nút điều khiển:</span>
+                  <span className="text-[11px] font-semibold text-blue-700 lowercase">
+                    {product.id === 'switch-luxury'
+                      ? '730k (1 nút) • 765k (2 nút) • 795k (3 nút) • 825k (4 nút)'
+                      : product.id === 'switch-smech'
+                      ? '460k (1 nút) • 485k (2 nút) • 520k (3 nút) • 550k (4 nút)'
+                      : ''}
+                  </span>
                 </label>
                 <div className="grid grid-cols-4 gap-2">
-                  {[1, 2, 3, 4].map((g) => (
-                    <button
-                      key={g}
-                      type="button"
-                      onClick={() => setGangs(g)}
-                      className={`py-2 px-2 rounded-xl font-bold text-xs transition-all cursor-pointer ${
-                        gangs === g
-                          ? 'bg-blue-700 text-white shadow-sm ring-2 ring-blue-700/20'
-                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                      }`}
-                    >
-                      {g} Nút
-                    </button>
-                  ))}
+                  {[1, 2, 3, 4].map((g) => {
+                    const gPrice = product.id === 'switch-luxury'
+                      ? (g === 1 ? '730k' : g === 2 ? '765k' : g === 3 ? '795k' : '825k')
+                      : product.id === 'switch-smech'
+                      ? (g === 1 ? '460k' : g === 2 ? '485k' : g === 3 ? '520k' : '550k')
+                      : null;
+
+                    return (
+                      <button
+                        key={g}
+                        type="button"
+                        onClick={() => setGangs(g)}
+                        className={`py-2 px-1.5 rounded-xl font-bold text-xs transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5 ${
+                          gangs === g
+                            ? 'bg-blue-700 text-white shadow-sm ring-2 ring-blue-700/20'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        }`}
+                      >
+                        <span>{g} Nút</span>
+                        {gPrice && (
+                          <span className={`text-[10px] ${gangs === g ? 'text-blue-100' : 'text-slate-500'}`}>
+                            {gPrice}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}

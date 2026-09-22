@@ -64,6 +64,10 @@ function AppContent() {
       {/* Top Fixed Navigation */}
       <Navbar
         onOpenOrder={() => handleOpenOrder('switch-luxury')}
+        onOpenOrdersFileModal={() => {
+          setOrdersFileLastUpdated(Date.now());
+          setIsOrdersFileModalOpen(true);
+        }}
       />
 
       {/* Main Content Sections - Compact & Harmonious spacing */}

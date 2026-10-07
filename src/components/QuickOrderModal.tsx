@@ -220,7 +220,7 @@ export const QuickOrderModal: React.FC<QuickOrderModalProps> = ({
           <div className="flex flex-col gap-1 pr-6">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[11px] font-extrabold text-blue-700 uppercase tracking-wider bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
-                ĐIỆN 365 • ĐẠI LÝ CHÍNH THỨC HUNONIC
+                ECOAU • ĐẠI LÝ CHÍNH THỨC HUNONIC
               </span>
               <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full flex items-center gap-1 border border-emerald-200">
                 <span className="material-symbols-outlined text-[13px]">verified</span>
@@ -263,7 +263,7 @@ export const QuickOrderModal: React.FC<QuickOrderModalProps> = ({
               </h4>
               <p className="text-xs sm:text-sm text-slate-600 max-w-md">
                 Mã đơn hàng: <strong className="text-blue-700 font-mono text-base">{submittedOrderSummary.code}</strong>.
-                Kỹ sư của Điện 365 sẽ gọi điện thoại tới số <strong className="text-slate-800">{submittedOrderSummary.phone}</strong>{' '}
+                Kỹ sư của ECOAU sẽ gọi điện thoại tới số <strong className="text-slate-800">{submittedOrderSummary.phone}</strong>{' '}
                 để đối soát thông tin và đóng gói chuyển phát nhanh Viettel Post.
               </p>
             </div>
@@ -819,7 +819,7 @@ export const QuickOrderModal: React.FC<QuickOrderModalProps> = ({
               </button>
 
               <p className="text-center text-[11px] text-slate-500">
-                🔒 Thông tin được bảo mật 100%. Kỹ sư Điện 365 sẽ liên hệ trong 5-10 phút để xác nhận đơn hàng.
+                🔒 Thông tin được bảo mật 100%. Kỹ sư ECOAU sẽ liên hệ trong 5-10 phút để xác nhận đơn hàng.
               </p>
             </div>
           </form>

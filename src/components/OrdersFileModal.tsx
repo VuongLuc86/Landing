@@ -18,8 +18,9 @@ interface GoogleSheetConfigState {
 }
 
 const APPS_SCRIPT_TEMPLATE = `/**
- * GOOGLE APPS SCRIPT - ĐỒNG BỘ ĐƠN HÀNG TỰ ĐỘNG CHO HUNONIC ĐIỆN 365
- * Hỗ trợ cả POST và GET - Tự động định dạng bảng và bảo toàn số 0 ở SĐT
+ * GOOGLE APPS SCRIPT - ĐỒNG BỘ ĐƠN HÀNG TỰ ĐỘNG CHO HUNONIC ECOAU
+ * Chuẩn 8 cột bảng tính: STT | Họ tên | SĐT | Địa chỉ | Sản phẩm mua | Ngày tháng năm | Số tiền thanh toán | Ghi chú
+ * Tự động tìm dòng trống kế tiếp (không bị nhảy xuống sau dòng "Tổng") & bảo toàn số 0 ở SĐT
  */
 
 function doGet(e) {
@@ -28,7 +29,7 @@ function doGet(e) {
   }
   return ContentService.createTextOutput(JSON.stringify({
     status: "success",
-    message: "Webhook Google Sheet Điện 365 Hunonic hoạt động bình thường! Sẵn sàng nhận đơn hàng."
+    message: "Webhook Google Sheet ECOAU Hunonic hoạt động bình thường! Sẵn sàng nhận đơn hàng."
   })).setMimeType(ContentService.MimeType.JSON);
 }
 
@@ -58,20 +59,19 @@ function handleOrderRecord(data) {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = ss.getActiveSheet();
 
-    // 1. Tự động tạo dòng tiêu đề nếu bảng tính còn trống
+    // 1. Tự động tạo dòng tiêu đề chuẩn 8 cột nếu bảng tính còn hoàn toàn trống
     if (sheet.getLastRow() === 0) {
       sheet.appendRow([
         "STT",
-        "Họ tên khách hàng",
-        "Số điện thoại",
-        "Địa chỉ giao hàng",
-        "Sản phẩm đặt mua",
-        "Ngày đặt hàng",
-        "Tổng tiền (VNĐ)",
-        "Ghi chú",
-        "Thời gian ghi nhận hệ thống"
+        "Họ tên",
+        "SĐT",
+        "Địa chỉ",
+        "Sản phẩm mua",
+        "Ngày tháng năm",
+        "Số tiền thanh toán",
+        "Ghi chú"
       ]);
-      var headerRange = sheet.getRange(1, 1, 1, 9);
+      var headerRange = sheet.getRange(1, 1, 1, 8);
       headerRange.setBackground("#1e40af");
       headerRange.setFontColor("#ffffff");
       headerRange.setFontWeight("bold");
@@ -79,17 +79,61 @@ function handleOrderRecord(data) {
       sheet.setFrozenRows(1);
     }
 
-    var nextStt = sheet.getLastRow();
-    var sttVal = data.stt || nextStt;
+    // 2. Định dạng dữ liệu đơn hàng
     var rawPhone = String(data.phone || "").trim();
     var phone = rawPhone;
     if (rawPhone && !rawPhone.startsWith("'")) {
       phone = "'" + rawPhone;
     }
-
     var amountVal = Number(data.amount) || 0;
 
-    sheet.appendRow([
+    // 3. Tìm vị trí dòng trống cần ghi (Thông minh: Tránh bị nhảy ra sau dòng "Tổng")
+    var lastRow = sheet.getLastRow();
+    var targetRow = -1;
+    var totalRowIndex = -1;
+
+    var checkRows = Math.max(lastRow, 120);
+    var rangeValues = sheet.getRange(1, 1, checkRows, 2).getValues();
+
+    for (var i = 1; i < rangeValues.length; i++) {
+      var valA = String(rangeValues[i][0] || "").toLowerCase().trim();
+      var valB = String(rangeValues[i][1] || "").toLowerCase().trim();
+      if (valA.indexOf("tổng") !== -1 || valB.indexOf("tổng") !== -1) {
+        totalRowIndex = i + 1; // 1-indexed trong Google Sheet
+        break;
+      }
+    }
+
+    if (totalRowIndex > 0) {
+      // Có dòng "Tổng": tìm dòng trống đầu tiên giữa dòng 2 và dòng Tổng
+      for (var r = 2; r < totalRowIndex; r++) {
+        var rowName = String(sheet.getRange(r, 2).getValue() || "").trim();
+        var rowPhone = String(sheet.getRange(r, 3).getValue() || "").trim();
+        if (rowName === "" && rowPhone === "") {
+          targetRow = r;
+          break;
+        }
+      }
+      // Nếu các dòng trước dòng Tổng đã kín, chèn 1 dòng mới ngay trước dòng Tổng
+      if (targetRow === -1) {
+        sheet.insertRowBefore(totalRowIndex);
+        targetRow = totalRowIndex;
+      }
+    } else {
+      // Không có dòng Tổng: lấy dòng tiếp theo
+      targetRow = lastRow + 1;
+    }
+
+    // 4. Tính STT tự động nếu chưa có
+    var prevStt = 0;
+    if (targetRow > 2) {
+      var prevVal = sheet.getRange(targetRow - 1, 1).getValue();
+      prevStt = Number(prevVal) || 0;
+    }
+    var sttVal = data.stt || (prevStt > 0 ? prevStt + 1 : targetRow - 1);
+
+    // 5. Ghi dữ liệu vào đúng 8 cột
+    var rowData = [
       sttVal,
       data.fullName || "",
       phone,
@@ -97,20 +141,21 @@ function handleOrderRecord(data) {
       data.productName || "",
       data.orderDate || "",
       amountVal,
-      data.note || "",
-      new Date().toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })
-    ]);
+      data.note || ""
+    ];
 
-    var lastRow = sheet.getLastRow();
-    sheet.getRange(lastRow, 7).setNumberFormat("#,##0\" đ\"");
-    sheet.getRange(lastRow, 1).setHorizontalAlignment("center");
-    sheet.getRange(lastRow, 3).setHorizontalAlignment("center");
-    sheet.getRange(lastRow, 6).setHorizontalAlignment("center");
+    sheet.getRange(targetRow, 1, 1, 8).setValues([rowData]);
+
+    // 6. Định dạng thẩm mỹ cho dòng mới
+    sheet.getRange(targetRow, 1).setHorizontalAlignment("center");
+    sheet.getRange(targetRow, 3).setHorizontalAlignment("center");
+    sheet.getRange(targetRow, 6).setHorizontalAlignment("center");
+    sheet.getRange(targetRow, 7).setNumberFormat("#,##0\\" đ\\"").setHorizontalAlignment("right");
 
     return ContentService.createTextOutput(JSON.stringify({
       status: "success",
-      message: "Đã thêm đơn hàng #" + sttVal + " vào Google Sheet thành công",
-      row: lastRow
+      message: "Đã thêm đơn hàng #" + sttVal + " (" + (data.fullName || "") + ") vào Google Sheet tại dòng " + targetRow,
+      row: targetRow
     })).setMimeType(ContentService.MimeType.JSON);
   } catch (err) {
     return ContentService.createTextOutput(JSON.stringify({
@@ -334,7 +379,7 @@ export const OrdersFileModal: React.FC<OrdersFileModalProps> = ({
                   Dữ Liệu Đơn Hàng & Đồng Bộ Google Sheet
                 </h3>
                 <span className="text-xs bg-blue-100 text-blue-800 font-semibold px-2.5 py-0.5 rounded-full border border-blue-200">
-                  Điện 365 Hunonic
+                  ECOAU Hunonic
                 </span>
                 {sheetConfig.configured ? (
                   <span className="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-full flex items-center gap-1 border border-emerald-200">
@@ -587,6 +632,62 @@ export const OrdersFileModal: React.FC<OrdersFileModalProps> = ({
                   </button>
                 </div>
               </div>
+
+              {/* High-visibility Action Box when doPost error occurs */}
+              {sheetConfig.lastSyncStatus === 'error' && (
+                <div className="p-4.5 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 rounded-2xl shadow-xs text-xs text-amber-950 flex flex-col gap-3">
+                  <div className="flex items-center gap-2 text-amber-900 font-bold text-sm">
+                    <span className="material-symbols-outlined text-amber-600 text-[22px]">build_circle</span>
+                    <span>Cách Xử Lý Lỗi "Script function not found: doPost" Trong 30 Giây:</span>
+                  </div>
+                  <p className="text-slate-700 leading-relaxed">
+                    Google Apps Script báo lỗi này do URL Webhook hiện tại đang chạy bản triển khai rỗng ban đầu (chưa cập nhật mã nhận đơn). Chỉ cần 3 bước đơn giản:
+                  </p>
+                  <ol className="list-decimal list-inside space-y-1.5 pl-1 text-slate-800 font-medium">
+                    <li>
+                      Bấm nút <strong>"Sao Chép Mã Apps Script"</strong> bên dưới.
+                    </li>
+                    <li>
+                      Mở tab Google Apps Script của bạn, dán đè toàn bộ vào <code className="bg-amber-100 px-1 py-0.5 rounded font-mono text-[11px]">Code.gs</code> và bấm <strong>💾 Lưu dự án (Ctrl+S)</strong>.
+                    </li>
+                    <li>
+                      Bấm <strong>Triển khai (Deploy)</strong> &rarr; chọn <strong>Quản lý bản triển khai (Manage deployments)</strong> &rarr; bấm biểu tượng <strong>✏️ Chỉnh sửa</strong> ở góc trên &rarr; ở mục <strong>Phiên bản (Version)</strong> chọn <strong>"Phiên bản mới" (New version)</strong> &rarr; bấm <strong>Triển khai (Deploy)</strong>.
+                    </li>
+                  </ol>
+                  <div className="pt-2 flex flex-wrap items-center gap-2 border-t border-amber-200/80">
+                    <button
+                      type="button"
+                      onClick={handleCopyScript}
+                      className="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 cursor-pointer shadow-xs"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">content_copy</span>
+                      <span>{copyScriptSuccess ? 'Đã sao chép code!' : '1. Sao Chép Mã Mới'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleTestConnection}
+                      disabled={isTestingSheet || !sheetConfig.webhookUrl}
+                      className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">
+                        {isTestingSheet ? 'hourglass_top' : 'send'}
+                      </span>
+                      <span>{isTestingSheet ? 'Đang kiểm tra...' : '2. Bấm Gửi Thử Kiểm Tra Lại'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSyncAllOrders}
+                      disabled={isSyncingAll || !sheetConfig.webhookUrl}
+                      className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50 ml-auto"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">
+                        {isSyncingAll ? 'sync' : 'cloud_upload'}
+                      </span>
+                      <span>Đồng Bộ Đơn Khách Hàng (Vương Lực)</span>
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Message Banner */}
               {configMessage && (

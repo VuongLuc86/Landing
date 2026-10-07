@@ -220,7 +220,7 @@ export const OrderFormSection: React.FC<OrderFormProps> = ({
         <div className="flex flex-col items-center text-center gap-2.5 max-w-2xl mx-auto">
           <div className="flex flex-wrap items-center justify-center gap-2">
             <span className="text-xs text-blue-700 uppercase tracking-widest font-extrabold bg-blue-50 px-3 py-0.5 rounded-full border border-blue-200">
-              Điện 365 • Đại Lý Chính Thức HUNONIC
+              ECOAU • Đại Lý Chính Thức HUNONIC
             </span>
             <span className="text-slate-300">•</span>
             <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1">

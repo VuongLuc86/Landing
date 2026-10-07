@@ -275,7 +275,7 @@ export const VisualMiniCartModal: React.FC<VisualMiniCartModalProps> = ({ onView
               <p className="text-[11px] text-slate-300">
                 {checkoutStep === 'cart' && 'Miễn phí giao hàng toàn quốc • Đã gồm thuế VAT'}
                 {checkoutStep === 'checkout' && 'Chỉ mất 5 giây • Kiểm tra hàng trước khi trả tiền (COD)'}
-                {checkoutStep === 'success' && 'Điện 365 — Đại Lý Chính Thức HUNONIC'}
+                {checkoutStep === 'success' && 'ECOAU — Đại Lý Chính Thức HUNONIC'}
               </p>
             </div>
           </div>
@@ -885,7 +885,7 @@ export const VisualMiniCartModal: React.FC<VisualMiniCartModalProps> = ({ onView
                 CẢM ƠN QUÝ KHÁCH {lastCreatedOrder?.fullName?.toUpperCase()}!
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 mt-1">
-                Nhân viên kỹ thuật Điện 365 sẽ liên hệ qua số <strong>{lastCreatedOrder?.phone}</strong> để xác nhận và đóng gói gửi ngay.
+                Nhân viên kỹ thuật ECOAU sẽ liên hệ qua số <strong>{lastCreatedOrder?.phone}</strong> để xác nhận và đóng gói gửi ngay.
               </p>
             </div>
 

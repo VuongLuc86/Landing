@@ -64,7 +64,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder, onOpenOrdersFileMod
           <a href="#" className="flex items-center gap-3 shrink-0 group">
             <img
               src="/images/hunonic/logo-hunonic-ngang.png"
-              alt="Điện 365 Phân phối chính hãng HUNONIC"
+              alt="ECOAU Phân phối chính hãng HUNONIC"
               className="h-7 sm:h-8 w-auto object-contain group-hover:opacity-90 transition-opacity"
               onError={(e) => {
                 e.currentTarget.src = 'https://hunonic.com/wp-content/uploads/2024/05/logo-hunonic-ngang-1-1.png';
@@ -72,7 +72,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder, onOpenOrdersFileMod
             />
             <div className="hidden sm:flex flex-col border-l border-slate-200 pl-3">
               <span className="text-sm font-bold font-heading text-slate-900 leading-tight">
-                Điện 365
+                ECOAU
               </span>
               <span className="text-[11px] text-blue-700 font-semibold tracking-wide uppercase">
                 Phân phối chính hãng HUNONIC

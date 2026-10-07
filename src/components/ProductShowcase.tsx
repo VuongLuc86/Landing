@@ -387,7 +387,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
             </div>
             <div>
               <h4 className="text-base sm:text-lg font-bold font-heading">
-                Cam Kết Từ Điện 365 — Đại Lý Chính Thức Của HUNONIC
+                Cam Kết Từ ECOAU — Đại Lý Chính Thức Của HUNONIC
               </h4>
               <p className="text-xs sm:text-sm text-blue-100">
                 100% hàng chính hãng, kích hoạt bảo hành điện tử 24 tháng theo số điện thoại, hỗ trợ kỹ thuật tận tình 24/7.

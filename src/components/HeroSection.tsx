@@ -14,7 +14,7 @@ export const HeroSection: React.FC<HeroProps> = ({ onOpenOrder }) => {
           <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-blue-50 text-blue-900 border border-blue-200 text-xs sm:text-sm shadow-xs">
             <span className="w-2.5 h-2.5 rounded-full bg-blue-600 led-indicator shrink-0" />
             <span className="font-bold tracking-wide uppercase">
-              Điện 365 • Đại Lý Chính Thức Của HUNONIC Việt Nam
+              ECOAU • Đại Lý Chính Thức Của HUNONIC Việt Nam
             </span>
           </div>
 

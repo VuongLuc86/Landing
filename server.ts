@@ -164,7 +164,7 @@ async function sendOrderToGoogleSheet(order: OrderItem, config?: GoogleSheetConf
       orderDate: order.orderDate,
       amount: order.amount,
       note: order.note || '',
-      source: 'Website Dien365 Hunonic D2C',
+      source: 'Website ECOAU Hunonic D2C',
       createdAt: new Date().toISOString(),
     };
 
@@ -186,7 +186,7 @@ async function sendOrderToGoogleSheet(order: OrderItem, config?: GoogleSheetConf
 
     // Check for Google Apps Script specific error pages (which return HTTP 200 with HTML)
     if (responseText.includes('Script function not found: doPost') || responseText.includes('Script function not found: doGet')) {
-      const errMsg = 'Google Apps Script báo lỗi: "Script function not found: doPost". NGUYÊN NHÂN: Trong trang Apps Script, bạn chưa tạo Bản Triển Khai Mới sau khi dán mã. Vui lòng bấm: Triển khai -> Quản lý bản triển khai -> Sửa -> Chọn "Phiên bản mới" -> Triển khai.';
+      const errMsg = 'Google Apps Script báo lỗi: "Script function not found: doPost". NGUYÊN NHÂN: Bản triển khai hiện tại của bạn chưa nhận mã mới. Vui lòng bấm: Triển khai (Deploy) -> Quản lý bản triển khai (Manage deployments) -> Biểu tượng Chỉnh sửa (cây bút) -> Phiên bản chọn "Phiên bản mới" (New version) -> Triển khai.';
       saveGoogleSheetConfig({
         lastSyncTime: new Date().toLocaleString('vi-VN'),
         lastSyncStatus: 'error',
@@ -389,7 +389,7 @@ app.post('/api/google-sheet/test', async (req, res) => {
       productName: 'Công Tắc Thông Minh Hunonic Luxury (Test)',
       orderDate: new Date().toLocaleDateString('vi-VN'),
       amount: 730000,
-      note: 'Dữ liệu kiểm tra kết nối từ website Dien365 Hunonic',
+      note: 'Dữ liệu kiểm tra kết nối từ website ECOAU Hunonic',
     };
 
     const result = await sendOrderToGoogleSheet(testOrder, {
@@ -457,7 +457,7 @@ app.get('/api/orders/download', (req, res) => {
     const content = fs.readFileSync(CSV_FILE_PATH, 'utf-8');
     const bom = '\uFEFF';
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-    res.setHeader('Content-Disposition', 'attachment; filename="dien_365_don_hang_hunonic.csv"');
+    res.setHeader('Content-Disposition', 'attachment; filename="ecoau_don_hang_hunonic.csv"');
     res.send(bom + content);
   } catch (err) {
     console.error('Download error:', err);

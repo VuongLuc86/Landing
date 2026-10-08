@@ -177,6 +177,11 @@ export const OrdersFileModal: React.FC<OrdersFileModalProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [copySuccess, setCopySuccess] = useState<boolean>(false);
   const [copyScriptSuccess, setCopyScriptSuccess] = useState<boolean>(false);
+  const [isDownloading, setIsDownloading] = useState<boolean>(false);
+  const [downloadNotification, setDownloadNotification] = useState<{
+    type: 'success' | 'error';
+    text: string;
+  } | null>(null);
 
   // Google Sheet Configuration State
   const [sheetConfig, setSheetConfig] = useState<GoogleSheetConfigState>({
@@ -337,8 +342,82 @@ export const OrdersFileModal: React.FC<OrdersFileModalProps> = ({
     }
   };
 
-  const handleDownloadCsv = () => {
-    window.open('/api/orders/download', '_blank');
+  const handleDownloadCsv = async () => {
+    setIsDownloading(true);
+    setDownloadNotification(null);
+    try {
+      let csvContent = '';
+
+      // Cách 1: Tải trực tiếp nội dung CSV từ API máy chủ
+      try {
+        const res = await fetch('/api/orders/download');
+        if (res.ok) {
+          csvContent = await res.text();
+        }
+      } catch (e) {
+        console.warn('Lỗi khi tải từ API /api/orders/download, sử dụng dữ liệu bộ nhớ đệm', e);
+      }
+
+      // Cách 2: Nếu API không trả về nội dung, dựng từ rawCsv hoặc mảng đơn hàng orders
+      if (!csvContent || csvContent.trim().length === 0) {
+        if (rawCsv && rawCsv.trim().length > 0) {
+          csvContent = rawCsv;
+        } else if (orders.length > 0) {
+          const header = 'STT,Họ tên,SĐT,Địa chỉ,Sản phẩm mua,Ngày tháng năm,Số tiền thanh toán,Ghi chú\n';
+          const rows = orders
+            .map((o) => {
+              const addr = o.address.includes(',') ? `"${o.address.replace(/"/g, '""')}"` : o.address;
+              const prod = o.productName.includes(',') ? `"${o.productName.replace(/"/g, '""')}"` : o.productName;
+              const name = o.fullName.includes(',') ? `"${o.fullName.replace(/"/g, '""')}"` : o.fullName;
+              const note = (o.note || '').includes(',') ? `"${(o.note || '').replace(/"/g, '""')}"` : (o.note || '');
+              return `${o.stt},${name},'${o.phone}',${addr},${prod},${o.orderDate},${o.amount},${note}`;
+            })
+            .join('\n');
+          const totalRow = `\n,Tổng,,,,,${totalAmount},\n`;
+          csvContent = header + rows + totalRow;
+        }
+      }
+
+      if (!csvContent || csvContent.trim().length === 0) {
+        throw new Error('Chưa có dữ liệu đơn hàng trong hệ thống để xuất file');
+      }
+
+      // Đảm bảo có tiền tố UTF-8 BOM \uFEFF để Microsoft Excel hiển thị đúng tiếng Việt có dấu
+      const cleanContent = csvContent.replace(/^\uFEFF/, '');
+      const blob = new Blob(['\uFEFF' + cleanContent], { type: 'text/csv;charset=utf-8;' });
+
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const fileName = `ecoau_don_hang_hunonic_${todayStr}.csv`;
+
+      // Kỹ thuật tải xuống chuẩn DOM Anchor (hoàn toàn an toàn trong iFrame và không bị popup blocker chặn)
+      const blobUrl = URL.createObjectURL(blob);
+      const downloadLink = document.createElement('a');
+      downloadLink.href = blobUrl;
+      downloadLink.setAttribute('download', fileName);
+      downloadLink.style.display = 'none';
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+
+      setTimeout(() => {
+        document.body.removeChild(downloadLink);
+        URL.revokeObjectURL(blobUrl);
+      }, 500);
+
+      setDownloadNotification({
+        type: 'success',
+        text: `Đã tải xuống file "${fileName}" thành công! File đã được lưu vào thư mục Downloads của bạn.`,
+      });
+      setTimeout(() => setDownloadNotification(null), 5000);
+    } catch (err: any) {
+      console.error('Lỗi khi tải file CSV:', err);
+      setDownloadNotification({
+        type: 'error',
+        text: `Không thể tải file: ${err?.message || 'Vui lòng bấm chuyển sang tab "Xem File Thô CSV" để sao chép dữ liệu'}`,
+      });
+      setTimeout(() => setDownloadNotification(null), 6000);
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   const handleCopyRawCsv = () => {
@@ -452,7 +531,7 @@ export const OrdersFileModal: React.FC<OrdersFileModalProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            {activeTab === 'table' && (
+            {(activeTab === 'table' || activeTab === 'raw') && (
               <>
                 <button
                   onClick={fetchOrders}
@@ -464,10 +543,18 @@ export const OrdersFileModal: React.FC<OrdersFileModalProps> = ({
                 </button>
                 <button
                   onClick={handleDownloadCsv}
-                  className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs flex items-center gap-1 cursor-pointer"
+                  disabled={isDownloading}
+                  className={`px-3 py-1.5 rounded-lg text-white text-xs font-bold shadow-xs flex items-center gap-1.5 cursor-pointer transition-all ${
+                    isDownloading
+                      ? 'bg-emerald-400 cursor-not-allowed'
+                      : 'bg-emerald-600 hover:bg-emerald-700 active:scale-95'
+                  }`}
+                  title="Tải file .CSV trực tiếp về máy"
                 >
-                  <span className="material-symbols-outlined text-[16px]">download</span>
-                  <span>Tải file .CSV</span>
+                  <span className={`material-symbols-outlined text-[16px] ${isDownloading ? 'animate-spin' : ''}`}>
+                    {isDownloading ? 'sync' : 'download'}
+                  </span>
+                  <span>{isDownloading ? 'Đang xuất...' : 'Tải file .CSV'}</span>
                 </button>
               </>
             )}
@@ -485,6 +572,30 @@ export const OrdersFileModal: React.FC<OrdersFileModalProps> = ({
             )}
           </div>
         </div>
+
+        {/* Download notification alert banner */}
+        {downloadNotification && (
+          <div
+            className={`mx-4 sm:mx-6 mt-4 p-3.5 rounded-xl border flex items-center justify-between gap-3 text-xs font-medium ${
+              downloadNotification.type === 'success'
+                ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
+                : 'bg-rose-50 border-rose-300 text-rose-900'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[20px] shrink-0">
+                {downloadNotification.type === 'success' ? 'check_circle' : 'error'}
+              </span>
+              <span>{downloadNotification.text}</span>
+            </div>
+            <button
+              onClick={() => setDownloadNotification(null)}
+              className="p-1 hover:bg-black/5 rounded-md cursor-pointer shrink-0"
+            >
+              <span className="material-symbols-outlined text-[16px]">close</span>
+            </button>
+          </div>
+        )}
 
         {/* Content Tabs */}
         <div className="flex-1 overflow-auto p-4 sm:p-6 bg-slate-50/50">
@@ -885,15 +996,31 @@ export const OrdersFileModal: React.FC<OrdersFileModalProps> = ({
                 <span className="text-xs font-semibold text-slate-600">
                   Nội dung chuẩn tệp <code className="font-mono bg-slate-200 px-1 py-0.5 rounded text-slate-800">orders.csv</code> trên server:
                 </span>
-                <button
-                  onClick={handleCopyRawCsv}
-                  className="px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50 text-blue-700 text-xs font-semibold hover:bg-blue-100 flex items-center gap-1 cursor-pointer"
-                >
-                  <span className="material-symbols-outlined text-[16px]">
-                    {copySuccess ? 'check' : 'content_copy'}
-                  </span>
-                  <span>{copySuccess ? 'Đã sao chép!' : 'Copy CSV'}</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleDownloadCsv}
+                    disabled={isDownloading}
+                    className={`px-3 py-1.5 rounded-lg text-white text-xs font-bold shadow-xs flex items-center gap-1 cursor-pointer transition-all ${
+                      isDownloading
+                        ? 'bg-emerald-400 cursor-not-allowed'
+                        : 'bg-emerald-600 hover:bg-emerald-700 active:scale-95'
+                    }`}
+                  >
+                    <span className={`material-symbols-outlined text-[16px] ${isDownloading ? 'animate-spin' : ''}`}>
+                      {isDownloading ? 'sync' : 'download'}
+                    </span>
+                    <span>{isDownloading ? 'Đang xuất...' : 'Tải file .CSV'}</span>
+                  </button>
+                  <button
+                    onClick={handleCopyRawCsv}
+                    className="px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50 text-blue-700 text-xs font-semibold hover:bg-blue-100 flex items-center gap-1 cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">
+                      {copySuccess ? 'check' : 'content_copy'}
+                    </span>
+                    <span>{copySuccess ? 'Đã sao chép!' : 'Copy CSV'}</span>
+                  </button>
+                </div>
               </div>
               <div className="bg-slate-900 text-emerald-400 p-4 rounded-2xl font-mono text-xs overflow-x-auto leading-relaxed border border-slate-800 shadow-inner">
                 <pre>{rawCsv || 'Đang nạp file orders.csv...'}</pre>

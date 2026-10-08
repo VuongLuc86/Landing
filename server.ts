@@ -454,14 +454,24 @@ app.post('/api/google-sheet/sync-all', async (req, res) => {
 app.get('/api/orders/download', (req, res) => {
   try {
     ensureCsvFile();
-    const content = fs.readFileSync(CSV_FILE_PATH, 'utf-8');
+    let content = '';
+    if (fs.existsSync(CSV_FILE_PATH)) {
+      content = fs.readFileSync(CSV_FILE_PATH, 'utf-8');
+    } else {
+      content =
+        'STT,Họ tên,SĐT,Địa chỉ,Sản phẩm mua,Ngày tháng năm,Số tiền thanh toán,Ghi chú\n';
+    }
+    // Remove existing BOM if present to avoid double BOM
+    const cleanContent = content.replace(/^\uFEFF/, '');
     const bom = '\uFEFF';
+
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader('Content-Disposition', 'attachment; filename="ecoau_don_hang_hunonic.csv"');
-    res.send(bom + content);
-  } catch (err) {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.send(bom + cleanContent);
+  } catch (err: any) {
     console.error('Download error:', err);
-    res.status(500).send('Không thể tải file');
+    res.status(500).send('Không thể tải file: ' + (err?.message || 'Lỗi hệ thống'));
   }
 });
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PRODUCTS_DATA, PRODUCT_CATEGORIES } from '../data/mockData';
+import { PRODUCTS_DATA, PRODUCT_CATEGORIES, checkMatchesCategory } from '../data/mockData';
 import { ProductShape } from '../types';
 import { useCart } from '../context/CartContext';
 import { VIETNAM_PROVINCES } from '../data/vietnamAddressData';
@@ -15,7 +15,7 @@ interface OrderFormProps {
 }
 
 export const OrderFormSection: React.FC<OrderFormProps> = ({
-  initialBundleId = 'switch-luxury',
+  initialBundleId = 'hnn-wifi-sq-1n',
   onOpenQuickOrderModal,
   onOpenOrdersFileModal,
 }) => {
@@ -232,34 +232,7 @@ export const OrderFormSection: React.FC<OrderFormProps> = ({
           <h2 className="text-2xl sm:text-3xl font-bold font-heading text-slate-900 leading-tight">
             Đặt Hàng Nhanh — Giao Tận Nơi Toàn Quốc
           </h2>
-          <p className="text-xs sm:text-sm text-slate-600">
-            Form tinh gọn chỉ 3 thông tin cốt lõi (Họ tên, Số điện thoại, Địa chỉ nhận hàng). Nhận hàng kiểm tra thử trước khi thanh toán (COD).
-          </p>
 
-          <div className="pt-1 flex flex-wrap items-center justify-center gap-2.5">
-            <button
-              type="button"
-              onClick={() => {
-                setCheckoutStep('cart');
-                setIsCartOpen(true);
-              }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold shadow-md transition-all cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-[16px] text-amber-400">shopping_bag</span>
-              <span>Mở Popup Giỏ Hàng Mini</span>
-            </button>
-
-            {onOpenOrdersFileModal && (
-              <button
-                type="button"
-                onClick={onOpenOrdersFileModal}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 text-blue-800 text-xs font-bold border border-slate-300 shadow-2xs transition-colors cursor-pointer"
-              >
-                <span className="material-symbols-outlined text-[16px] text-blue-700">description</span>
-                <span>Xem File Đơn Hàng (orders.csv)</span>
-              </button>
-            )}
-          </div>
         </div>
 
         {orderConfirmed ? (
@@ -337,26 +310,7 @@ export const OrderFormSection: React.FC<OrderFormProps> = ({
                 </div>
               )}
 
-              {/* Autofill indicator */}
-              {customerProfile.fullName && (
-                <div className="p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-xs font-semibold flex items-center justify-between">
-                  <span className="flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-[16px] text-blue-700">auto_fix_high</span>
-                    <span>Tự động điền trước thông tin từ lần ghé thăm trước</span>
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setFullName('');
-                      setPhoneNumber('');
-                      setAddress('');
-                    }}
-                    className="text-blue-600 hover:underline text-[11px] cursor-pointer"
-                  >
-                    Điền mới
-                  </button>
-                </div>
-              )}
+
 
               <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
                 {/* Left Column: Product selection & Pricing Breakdown */}
@@ -373,13 +327,13 @@ export const OrderFormSection: React.FC<OrderFormProps> = ({
                     className="w-full text-xs font-semibold text-slate-900 bg-white border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-600 focus:outline-none"
                   >
                     {PRODUCT_CATEGORIES.filter((c) => c.id !== 'tat-ca').map((cat) => {
-                      const catProducts = PRODUCTS_DATA.filter((p) => p.categorySlug === cat.id);
+                      const catProducts = PRODUCTS_DATA.filter((p) => checkMatchesCategory(p, cat.id));
                       if (catProducts.length === 0) return null;
                       return (
                         <optgroup key={cat.id} label={`── ${cat.name} (${catProducts.length}) ──`}>
                           {catProducts.map((p) => (
                             <option key={p.id} value={p.id}>
-                              {p.name} — {p.price.toLocaleString('vi-VN')}đ (Đã gồm VAT)
+                              {p.name} — {p.price.toLocaleString('vi-VN')}đ
                             </option>
                           ))}
                         </optgroup>

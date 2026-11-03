@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { PRODUCTS_DATA, PRODUCT_CATEGORIES } from '../data/mockData';
+import { PRODUCTS_DATA, PRODUCT_CATEGORIES, checkMatchesCategory } from '../data/mockData';
 import { Product } from '../types';
 import { TechnicalSpecsModal } from './TechnicalSpecsModal';
 import { useCart } from '../context/CartContext';
@@ -13,14 +13,25 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('tat-ca');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'discount'>('price-desc');
-  const [visibleCount, setVisibleCount] = useState<number>(24);
+  const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'discount'>('default');
+  const [visibleCount, setVisibleCount] = useState<number>(30);
   const [viewingSpecsProduct, setViewingSpecsProduct] = useState<Product | null>(null);
   const { addToCart, openCheckoutWithItem } = useCart();
 
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {
+      'tat-ca': PRODUCTS_DATA.length,
+    };
+    for (const cat of PRODUCT_CATEGORIES) {
+      if (cat.id === 'tat-ca') continue;
+      counts[cat.id] = PRODUCTS_DATA.filter((p) => checkMatchesCategory(p, cat.id)).length;
+    }
+    return counts;
+  }, []);
+
   const filteredProducts = useMemo(() => {
     const list = PRODUCTS_DATA.filter((p) => {
-      const matchesCategory = selectedCategory === 'tat-ca' || p.categorySlug === selectedCategory;
+      const matchesCategory = checkMatchesCategory(p, selectedCategory);
       if (!matchesCategory) return false;
       if (!searchQuery.trim()) return true;
       const q = searchQuery.toLowerCase().trim();
@@ -32,11 +43,11 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
       );
     });
 
-    return list.sort((a, b) => {
+    return [...list].sort((a, b) => {
       if (sortBy === 'price-asc') return a.price - b.price;
       if (sortBy === 'price-desc') return b.price - a.price;
       if (sortBy === 'discount') return b.discountPercent - a.discountPercent;
-      return b.price - a.price; // Sắp xếp thiết bị đắt tiền nhất lên trước
+      return 0; // Giữ nguyên thứ tự danh mục chuẩn Hunonic
     });
   }, [selectedCategory, searchQuery, sortBy]);
 
@@ -49,125 +60,150 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
         <div className="flex flex-col items-center text-center gap-3 max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-50 border border-blue-200/60 text-blue-700 text-xs font-bold uppercase tracking-wider">
             <span className="material-symbols-outlined text-[16px]">verified</span>
-            <span>Danh Mục Thiết Bị Chính Hãng Hunonic Việt Nam</span>
+            <span>Danh Mục Thiết Bị Chính Hãng Hunonic Việt Nam ({PRODUCTS_DATA.length} Sản Phẩm)</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold font-heading text-slate-900 leading-tight">
-            Sản Phẩm, Thông Số Kỹ Thuật & Giá Bán Ưu Đãi Trực Tiếp
-          </h2>
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl">
             Tất cả thiết bị được nghiên cứu, lập trình phần mềm và sản xuất 100% tại Việt Nam. Vừa vặn hoàn hảo mọi hộp đế âm tiêu chuẩn chữ nhật Sino, Panasonic & chuẩn vuông EU.
           </p>
         </div>
 
-        {/* Category Tabs Navigation matching hunonic.com */}
-        <div className="w-full flex items-center justify-start lg:justify-center overflow-x-auto pb-2 scrollbar-none gap-2 sm:gap-3">
-          {PRODUCT_CATEGORIES.map((cat) => {
-            const count =
-              cat.id === 'tat-ca'
-                ? PRODUCTS_DATA.length
-                : PRODUCTS_DATA.filter((p) => p.categorySlug === cat.id).length;
-            const isActive = selectedCategory === cat.id;
-
-            return (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => {
-                  setSelectedCategory(cat.id);
-                  setVisibleCount(24);
-                }}
-                className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold shrink-0 transition-all flex items-center gap-2 cursor-pointer ${
-                  isActive
-                    ? 'bg-blue-700 text-white shadow-md shadow-blue-700/25 scale-[1.02]'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200/80'
-                }`}
-              >
-                <span className="material-symbols-outlined text-[18px]">{cat.icon}</span>
-                <span>{cat.name}</span>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
-                    isActive ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600'
-                  }`}
-                >
-                  {count}
+        {/* Main 2-Column Section: Sidebar Category Navigation like https://hunonic.com/thiet-bi-dien-thong-minh/ */}
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+          {/* Left Sidebar Category Navigation (Matches hunonic.com screenshot) */}
+          <aside className="w-full lg:w-72 shrink-0">
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs sticky top-24">
+              <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-3 px-3 flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[18px] text-emerald-600">category</span>
+                  Danh Mục Sản Phẩm
                 </span>
-              </button>
-            );
-          })}
-        </div>
+                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+                  {PRODUCTS_DATA.length}
+                </span>
+              </h3>
+              <nav className="flex flex-col gap-1.5" aria-label="Danh mục sản phẩm">
+                {PRODUCT_CATEGORIES.map((cat) => {
+                  const isActive = selectedCategory === cat.id;
+                  const count = categoryCounts[cat.id] ?? 0;
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedCategory(cat.id);
+                        setVisibleCount(24);
+                      }}
+                      className={`w-full text-left px-3.5 py-2.5 rounded-xl transition-all cursor-pointer font-medium text-sm sm:text-base flex items-center justify-between gap-2 ${
+                        isActive
+                          ? 'bg-gradient-to-r from-[#62d98c] to-[#88e8aa] text-[#153e26] font-bold shadow-sm scale-[1.01]'
+                          : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      <span className="truncate">{cat.name}</span>
+                      <span
+                        className={`text-xs px-2 py-0.5 rounded-full font-bold shrink-0 ${
+                          isActive
+                            ? 'bg-emerald-900/15 text-[#153e26]'
+                            : 'bg-slate-100 text-slate-500'
+                        }`}
+                      >
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
+          </aside>
 
-        {/* Search & Sort Controls */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-200/80">
-          <div className="relative flex-1">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">
-              search
-            </span>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setVisibleCount(24);
-              }}
-              placeholder="Tìm kiếm theo tên thiết bị, công tắc, camera, ổ cắm, cửa cuốn..."
-              className="w-full pl-10 pr-9 py-2 rounded-xl text-xs sm:text-sm bg-white border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium text-slate-800 placeholder-slate-400"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchQuery('');
-                  setVisibleCount(24);
-                }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                title="Xóa tìm kiếm"
-              >
-                <span className="material-symbols-outlined text-[18px]">cancel</span>
-              </button>
+          {/* Right Area: Search, Controls, Products Grid */}
+          <div className="flex-1 w-full min-w-0 flex flex-col gap-6">
+            {/* Search & Sort Controls */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-200/80">
+              <div className="relative flex-1">
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">
+                  search
+                </span>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setVisibleCount(24);
+                  }}
+                  placeholder="Tìm kiếm thiết bị, công tắc, camera, ổ cắm..."
+                  className="w-full pl-10 pr-9 py-2 rounded-xl text-xs sm:text-sm bg-white border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-600 font-medium text-slate-800 placeholder-slate-400"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery('');
+                      setVisibleCount(24);
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                    title="Xóa tìm kiếm"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">cancel</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 justify-end">
+                {/* Lựa chọn theo sản phẩm (Dropdown selector matching focus mode) */}
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => {
+                    setSelectedCategory(e.target.value);
+                    setVisibleCount(24);
+                  }}
+                  className="text-xs sm:text-sm font-bold text-slate-700 bg-white border border-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-600 cursor-pointer max-w-[190px] truncate"
+                  title="Lựa chọn theo sản phẩm"
+                >
+                  {PRODUCT_CATEGORIES.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name} ({categoryCounts[cat.id] ?? 0})
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className="text-xs sm:text-sm font-bold text-slate-700 bg-white border border-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-600 cursor-pointer"
+                >
+                  <option value="price-desc">Giá: Cao đến Thấp (Đắt nhất trước)</option>
+                  <option value="price-asc">Giá: Thấp đến Cao</option>
+                  <option value="discount">Ưu Đãi Nhiều Nhất</option>
+                  <option value="default">Mặc Định Nổi Bật</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Empty Search State */}
+            {displayedProducts.length === 0 && (
+              <div className="text-center py-16 px-4 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
+                <span className="material-symbols-outlined text-[48px] text-slate-400 mb-2">search_off</span>
+                <h3 className="text-lg font-bold text-slate-800">Không tìm thấy thiết bị phù hợp</h3>
+                <p className="text-sm text-slate-500 mt-1 max-w-md mx-auto">
+                  Không có sản phẩm nào khớp với từ khóa "{searchQuery}". Vui lòng thử từ khóa khác hoặc chọn danh mục khác.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedCategory('tat-ca');
+                    setVisibleCount(24);
+                  }}
+                  className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition-colors cursor-pointer"
+                >
+                  Xem Tất Cả 109 Sản Phẩm
+                </button>
+              </div>
             )}
-          </div>
 
-          <div className="flex items-center gap-2 justify-between sm:justify-end">
-            <span className="text-xs text-slate-500 font-semibold shrink-0">
-              {filteredProducts.length} sản phẩm
-            </span>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="text-xs font-bold text-slate-700 bg-white border border-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 cursor-pointer"
-            >
-              <option value="price-desc">Giá: Cao đến Thấp (Đắt nhất trước)</option>
-              <option value="price-asc">Giá: Thấp đến Cao</option>
-              <option value="discount">Ưu Đãi Nhiều Nhất</option>
-              <option value="default">Mặc Định Nổi Bật</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Empty Search State */}
-        {displayedProducts.length === 0 && (
-          <div className="text-center py-16 px-4 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
-            <span className="material-symbols-outlined text-[48px] text-slate-400 mb-2">search_off</span>
-            <h3 className="text-lg font-bold text-slate-800">Không tìm thấy thiết bị phù hợp</h3>
-            <p className="text-sm text-slate-500 mt-1 max-w-md mx-auto">
-              Không có sản phẩm nào khớp với từ khóa "{searchQuery}". Vui lòng thử từ khóa khác hoặc chọn danh mục khác.
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                setSearchQuery('');
-                setSelectedCategory('tat-ca');
-                setVisibleCount(24);
-              }}
-              className="mt-4 px-4 py-2 bg-blue-700 text-white rounded-xl text-xs font-bold hover:bg-blue-800 transition-colors cursor-pointer"
-            >
-              Xem Tất Cả 109 Sản Phẩm
-            </button>
-          </div>
-        )}
-
-        {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch">
+            {/* Products Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 items-stretch">
           {displayedProducts.map((product) => {
             const isTopRated = product.id === 'switch-luxury' || product.id === 'breaker-notec' || product.id === 'switch-smech';
 
@@ -378,31 +414,10 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({
             </button>
           </div>
         )}
-
-        {/* Bottom Notice: Official 365 Dealership Commitment */}
-        <div className="bg-gradient-to-r from-blue-900 to-indigo-900 rounded-2xl p-6 text-white flex flex-col lg:flex-row items-center justify-between gap-6 shadow-lg">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center shrink-0 border border-white/10">
-              <span className="material-symbols-outlined text-[28px] text-amber-400">verified_user</span>
-            </div>
-            <div>
-              <h4 className="text-base sm:text-lg font-bold font-heading">
-                Cam Kết Từ ECOAU — Đại Lý Chính Thức Của HUNONIC
-              </h4>
-              <p className="text-xs sm:text-sm text-blue-100">
-                100% hàng chính hãng, kích hoạt bảo hành điện tử 24 tháng theo số điện thoại, hỗ trợ kỹ thuật tận tình 24/7.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 shrink-0">
-            <a
-              href="#dat-hang"
-              className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-900 font-extrabold text-xs sm:text-sm shadow-md transition-transform hover:scale-105"
-            >
-              Nhận Báo Giá Toàn Bộ Hệ Thống
-            </a>
           </div>
         </div>
+
+
       </div>
 
       {/* Technical Specs Datasheet Modal */}

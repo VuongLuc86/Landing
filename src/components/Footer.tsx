@@ -18,8 +18,8 @@ export const Footer: React.FC = () => {
                 }}
               />
               <div className="flex flex-col border-l border-slate-700 pl-3">
-                <span className="text-sm font-black font-heading text-white">ECOAU</span>
-                <span className="text-[11px] text-blue-400 font-bold uppercase">Phân Phối Chính Hãng HUNONIC</span>
+                <span className="text-sm font-black font-heading text-white">Công ty TNHH ECOAU</span>
+                <span className="text-[11px] text-blue-400 font-bold uppercase">Đại Lý Chính Hãng HUNONIC</span>
               </div>
             </div>
             <p className="text-xs leading-relaxed text-slate-400">
@@ -96,7 +96,7 @@ export const Footer: React.FC = () => {
 
         {/* Bottom bar */}
         <div className="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© 2026 ECOAU — Phân phối chính hãng HUNONIC Việt Nam. Nhà thông minh của người Việt.</p>
+          <p>© 2026 Công ty TNHH ECOAU — Đại lý chính hãng HUNONIC Việt Nam. Nhà thông minh của người Việt.</p>
           <div className="flex items-center gap-4">
             <span className="hover:text-slate-400 transition-colors cursor-pointer">Chính sách bảo hành</span>
             <span>•</span>

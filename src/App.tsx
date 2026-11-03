@@ -10,7 +10,6 @@ import { PainPointsSection } from './components/PainPointsSection';
 import { ProductShowcase } from './components/ProductShowcase';
 import { ComparisonTable } from './components/ComparisonTable';
 import { ReviewsAndCommitments } from './components/ReviewsAndCommitments';
-import { FlashSaleBanner } from './components/FlashSaleBanner';
 import { OrderFormSection } from './components/OrderFormSection';
 import { Footer } from './components/Footer';
 import { QuickOrderModal, QuickOrderTarget } from './components/QuickOrderModal';
@@ -63,7 +62,7 @@ function AppContent() {
     <div className="min-h-screen flex flex-col bg-[#f7f9fb] text-[#191c1e] relative">
       {/* Top Fixed Navigation */}
       <Navbar
-        onOpenOrder={() => handleOpenOrder('switch-luxury')}
+        onOpenOrder={() => handleOpenOrder('hnn-wifi-sq-1n')}
         onOpenOrdersFileModal={() => {
           setOrdersFileLastUpdated(Date.now());
           setIsOrdersFileModalOpen(true);
@@ -74,7 +73,7 @@ function AppContent() {
       <main className="flex-1 pt-24 sm:pt-28">
         {/* Section 1: Hero */}
         <HeroSection
-          onOpenOrder={() => handleOpenOrder('switch-luxury')}
+          onOpenOrder={() => handleOpenOrder('hnn-wifi-sq-1n')}
         />
 
         {/* Section 2: Pain Points & Solution */}
@@ -91,14 +90,11 @@ function AppContent() {
         {/* Section 5: Customer Reviews & Golden Commitments */}
         <ReviewsAndCommitments />
 
-        {/* Section 6: Flash Sale Banner & Direct Dealer Benefits */}
-        <FlashSaleBanner
-          onOpenOrder={() => handleOpenOrder('switch-luxury')}
-        />
+
 
         {/* Section 7: Streamlined 3-Field Order Section */}
         <OrderFormSection
-          initialBundleId={quickOrderTarget?.bundleId || 'switch-luxury'}
+          initialBundleId={quickOrderTarget?.bundleId || 'hnn-wifi-sq-1n'}
           onOpenQuickOrderModal={(target) => handleOpenOrder(target)}
           onOpenOrdersFileModal={() => {
             setOrdersFileLastUpdated(Date.now());

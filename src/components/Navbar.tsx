@@ -64,7 +64,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder, onOpenOrdersFileMod
           <a href="#" className="flex items-center gap-3 shrink-0 group">
             <img
               src="/images/hunonic/logo-hunonic-ngang.png"
-              alt="ECOAU Phân phối chính hãng HUNONIC"
+              alt="ECOAU Đại lý chính hãng HUNONIC"
               className="h-7 sm:h-8 w-auto object-contain group-hover:opacity-90 transition-opacity"
               onError={(e) => {
                 e.currentTarget.src = 'https://hunonic.com/wp-content/uploads/2024/05/logo-hunonic-ngang-1-1.png';
@@ -72,10 +72,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder, onOpenOrdersFileMod
             />
             <div className="hidden sm:flex flex-col border-l border-slate-200 pl-3">
               <span className="text-sm font-bold font-heading text-slate-900 leading-tight">
-                ECOAU
+                Công ty TNHH ECOAU
               </span>
               <span className="text-[11px] text-blue-700 font-semibold tracking-wide uppercase">
-                Phân phối chính hãng HUNONIC
+                Đại lý chính hãng HUNONIC
               </span>
             </div>
           </a>
@@ -113,10 +113,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder, onOpenOrdersFileMod
               Đánh giá
             </a>
             <a
-              href="#uu-dai"
+              href="#dat-hang"
               className="px-3 py-1.5 text-slate-700 hover:text-blue-700 hover:bg-slate-100/70 rounded-lg transition-colors"
             >
-              Báo giá
+              Đặt hàng
             </a>
           </nav>
 
@@ -215,12 +215,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenOrder, onOpenOrdersFileMod
               <span>Đánh giá khách hàng</span>
             </a>
             <a
-              href="#uu-dai"
+              href="#dat-hang"
               onClick={() => setMobileMenuOpen(false)}
               className="px-3 py-2.5 text-slate-800 font-medium hover:text-blue-700 hover:bg-slate-50 rounded-lg flex items-center gap-2.5"
             >
-              <span className="material-symbols-outlined text-[20px] text-slate-500">loyalty</span>
-              <span>Báo giá & Ưu đãi</span>
+              <span className="material-symbols-outlined text-[20px] text-slate-500">shopping_cart_checkout</span>
+              <span>Đặt hàng ngay</span>
             </a>
 
             <div className="mt-3 pt-3 border-t border-slate-100 flex flex-col gap-2">

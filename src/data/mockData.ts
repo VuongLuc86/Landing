@@ -1,5 +1,5 @@
 import { Product, ComboPackage, ComparisonRow, Testimonial, RecentOrderToastItem } from '../types';
-import { PRODUCTS_95 } from './hunonic95Products';
+import { HUNONIC_26_PRODUCTS } from './hunonic26Products';
 
 export interface ProductCategoryItem {
   id: string;
@@ -8,569 +8,87 @@ export interface ProductCategoryItem {
 }
 
 export const PRODUCT_CATEGORIES: ProductCategoryItem[] = [
-  { id: 'tat-ca', name: 'Tất Cả Sản Phẩm (109)', icon: 'grid_view' },
-  { id: 'khoa-thong-minh', name: 'Khóa Cửa Thông Minh', icon: 'lock' },
-  { id: 'cua-cuon-rem', name: 'Cửa Cuốn & Rèm Tự Động', icon: 'roller_shades' },
-  { id: 'nong-nghiep-bom', name: 'Bơm Tưới & Nông Nghiệp 4G', icon: 'water_drop' },
-  { id: 'aptomat', name: 'Aptomat & Đo Năng Lượng', icon: 'offline_bolt' },
-  { id: 'camera-an-ninh', name: 'Camera Giám Sát', icon: 'videocam' },
-  { id: 'cong-tac', name: 'Công Tắc Thông Minh', icon: 'toggle_on' },
-  { id: 'o-cam', name: 'Ổ Cắm Thông Minh', icon: 'power' },
-  { id: 'dieu-khien-cam-bien', name: 'Điều Khiển & Cảm Biến', icon: 'sensors' },
+  { id: 'tat-ca', name: 'Tất Cả Sản Phẩm', icon: 'grid_view' },
+  { id: 'cong-tac-cam-ung', name: 'Công Tắc Cảm Ứng', icon: 'touch_app' },
+  { id: 'cong-tac-thong-minh', name: 'Công Tắc Thông Minh', icon: 'toggle_on' },
+  { id: 'thiet-bi-an-toan-dien', name: 'Thiết Bị An Toàn Điện', icon: 'offline_bolt' },
+  { id: 'cam-bien-thong-minh', name: 'Cảm Biến Thông Minh', icon: 'sensors' },
+  { id: 'bo-dieu-khien-trung-tam', name: 'Bộ Điều Khiển Trung Tâm', icon: 'hub' },
+  { id: 'thiet-bi-an-ninh', name: 'Thiết Bị An Ninh', icon: 'security' },
 ];
 
-const INITIAL_FEATURED_PRODUCTS: Product[] = [
-  {
-    id: 'switch-luxury',
-    name: 'Công Tắc Cảm Ứng Hunonic Luxury',
-    category: 'Công tắc thông minh',
-    categorySlug: 'cong-tac',
-    tag: 'Bán Chạy Nhất',
-    badge: 'Mặt Kính 2.5D Cao Cấp',
-    price: 730000,
-    originalPrice: 895000,
-    discountPercent: 18,
-    warranty: '24 Tháng (1 Đổi 1)',
-    promotionNote: 'Tặng sơ đồ đấu nối + Miễn phí Server Cloud trọn đời',
-    shortDesc: 'Mặt kính cường lực vát cạnh 2.5D, viền nhôm Anode vát kim cương, 1-4 nút cảm ứng siêu nhạy.',
-    imageUrl: '/images/hunonic/hunonic-cam-ung.jpg',
-    fallbackImageUrl: '/images/hunonic/hunonic-cam-ung.jpg',
-    specs: [
-      'Công suất: 500W/kênh LED (tổng 2000W), điện áp 95-250V AC',
-      'Kết nối kép: Wi-Fi 2.4GHz + Bluetooth Mesh phản hồi siêu tốc 0.1s',
-      'Chuẩn đế âm: Chữ nhật 120x72mm hoặc vuông 86x86mm vừa 100%',
-      'Điều khiển từ xa qua App Hunonic và giọng nói Google/Siri',
-    ],
-    detailedSpecs: [
-      { label: 'Điện áp hoạt động', value: '95 – 250V AC / 50-60Hz' },
-      { label: 'Công suất chịu tải', value: '500W / kênh LED (tối đa 2000W tổng)' },
-      { label: 'Chuẩn kết nối', value: 'Wi-Fi 2.4GHz b/g/n + Bluetooth BLE Mesh' },
-      { label: 'Tiêu hao không tải', value: '< 0.5W / giờ' },
-      { label: 'Kích thước chuẩn', value: 'Chữ nhật: 120 x 72 x 32mm | Vuông: 86 x 86 x 32mm' },
-      { label: 'Vật liệu vỏ', value: 'Kính cường lực 2.5D + Viền nhôm Anode vát kim cương' },
-      { label: 'Đế âm tương thích', value: 'Đế âm Sino, Panasonic, Vanlock, Schneider 100%' },
-      { label: 'Phần mềm điều khiển', value: 'Hunonic App (Máy chủ Cloud tại Việt Nam)' },
-      { label: 'Thời gian bảo hành', value: '24 tháng 1 đổi 1 tận nơi chính hãng' },
-    ],
-    features: [
-      'Mặt kính cường lực chống trầy xước, viền nhôm Anode kim cương sang trọng',
-      'Đèn LED định vị ban đêm đổi màu xanh/đỏ dịu mắt, không gây chói ban đêm',
-      'Lập lịch bật tắt tự động, khóa trẻ em an toàn trên điện thoại',
-      'Tự động ghi nhớ và khôi phục trạng thái bật/tắt sau khi mất điện',
-    ],
-    options: {
-      gangs: [1, 2, 3, 4],
-      shapes: [
-        { id: 'rectangular', name: 'Đế chữ nhật (Sino, Panasonic tiêu chuẩn)', dimension: '120 x 72 x 32 mm' },
-        { id: 'square', name: 'Đế vuông (Tiêu chuẩn Châu Âu, Schneider)', dimension: '86 x 86 x 32 mm' },
-      ],
-      colors: [
-        { id: 'champagne', name: 'Vàng Champagne Ánh Kim', hex: '#D4AF37' },
-        { id: 'black', name: 'Đen Titan Huyền Bí', hex: '#1E293B' },
-      ],
-    },
-  },
-  {
-    id: 'switch-smech',
-    name: 'Công Tắc Cơ Thông Minh Hunonic Smech',
-    category: 'Công tắc thông minh',
-    categorySlug: 'cong-tac',
-    tag: 'Phím Cơ Bấm Thật',
-    badge: 'Độ Bền 100.000 Lần Bấm',
-    price: 450000,
-    originalPrice: 550000,
-    discountPercent: 18,
-    warranty: '24 Tháng (1 Đổi 1)',
-    promotionNote: 'Phím cơ đàn hồi nẩy tay + Không bám vân tay + Mặt nhôm nguyên khối',
-    shortDesc: 'Phím bấm vật lý cơ học nẩy tay êm ái, viền kim loại cao cấp, vừa vặn đế âm chữ nhật và vuông.',
-    imageUrl: '/images/hunonic/cong-tac-co-hnn-smech.jpg',
-    fallbackImageUrl: '/images/hunonic/cong-tac-co-hnn-smech.jpg',
-    specs: [
-      'Công suất tải: 500W/kênh đèn LED (Tổng 2000W), điện áp 95-250V AC',
-      'Phím bấm cơ học phản hồi xúc giác rõ ràng, phù hợp cả người lớn tuổi',
-      'Kết nối Wi-Fi 2.4GHz + BLE Mesh, điều khiển qua App Hunonic và giọng nói',
-      'Lắp vừa hộp đế âm tường chữ nhật 120x72mm hoặc đế vuông 86x86mm',
-    ],
-    detailedSpecs: [
-      { label: 'Điện áp sử dụng', value: '95 – 250V AC / 50-60Hz' },
-      { label: 'Công suất mỗi kênh', value: '500W / kênh LED (Tổng 2000W)' },
-      { label: 'Cơ chế nút bấm', value: 'Nút nhấn cơ học phản hồi nẩy tay tuổi thọ 100.000 lần' },
-      { label: 'Vật liệu bề mặt', value: 'Hợp kim nhôm Anode xử lý xước mờ chống bám vân tay' },
-      { label: 'Kết nối mạng', value: 'Wi-Fi 2.4GHz b/g/n + Bluetooth BLE Mesh' },
-      { label: 'Đế âm tương thích', value: 'Chữ nhật (Sino, Panasonic) & Vuông EU (Schneider)' },
-      { label: 'Tính năng trên app', value: 'Bật/tắt từ xa, hẹn giờ, tạo ngữ cảnh thông minh, chia sẻ' },
-      { label: 'Thời gian bảo hành', value: '24 tháng 1 đổi 1 tận nơi chính hãng' },
-    ],
-    features: [
-      'Cảm giác bấm cơ thật tay, người lớn tuổi và trẻ nhỏ dùng cực kỳ quen thuộc',
-      'Mặt kim loại nhôm Anode sang trọng không để lại mồ hôi hay dấu vân tay',
-      'Vẫn điều khiển bật/tắt từ xa qua điện thoại 4G/Wi-Fi mượt mà',
-      'Tự động ghi nhớ trạng thái sau khi cúp điện và có điện trở lại',
-    ],
-    options: {
-      gangs: [1, 2, 3, 4],
-      shapes: [
-        { id: 'rectangular', name: 'Đế chữ nhật (Sino, Panasonic tiêu chuẩn)', dimension: '120 x 72 x 32 mm' },
-        { id: 'square', name: 'Đế vuông (Tiêu chuẩn Châu Âu, Schneider)', dimension: '86 x 86 x 32 mm' },
-      ],
-      colors: [
-        { id: 'champagne', name: 'Vàng Champagne Ánh Kim', hex: '#D4AF37' },
-        { id: 'black', name: 'Đen Titan Sang Trọng', hex: '#1E293B' },
-      ],
-    },
-  },
-  {
-    id: 'switch-lahu',
-    name: 'Công Tắc Công Suất Lớn Hunonic Lahu 4000W',
-    category: 'Công tắc thông minh',
-    categorySlug: 'cong-tac',
-    tag: 'Tải Khủng 30A',
-    badge: 'Chuyên Dụng Bình Nước Nóng & Bơm',
-    price: 445000,
-    originalPrice: 520000,
-    discountPercent: 14,
-    warranty: '24 Tháng (1 Đổi 1)',
-    promotionNote: 'Miễn phí vận chuyển COD + Kỹ sư hướng dẫn đấu nối 1:1',
-    shortDesc: 'Rơ-le công suất khủng 30A - 4000W, có ăng-ten bắt sóng Wi-Fi xuyên tường cực mạnh.',
-    imageUrl: '/images/hunonic/lahu.jpg',
-    fallbackImageUrl: '/images/hunonic/lahu.jpg',
-    specs: [
-      'Công suất cực đại: 4000W (30A) cho bình nóng lạnh, điều hòa, máy bơm',
-      'Trang bị ăng ten ngoài tăng cường bắt sóng Wi-Fi xa gấp 3 lần',
-      'Hẹn giờ tự động tắt sau 15-30 phút đun nước, chống quên gây lãng phí điện',
-      'Vỏ nhựa chống cháy ABS kỹ thuật cao, gắn thanh ray hoặc bắt vít tường',
-    ],
-    detailedSpecs: [
-      { label: 'Điện áp danh định', value: '90 – 260V AC / 50Hz' },
-      { label: 'Dòng tải định mức', value: '30A cực đại (Công suất thực 4000W liên tục)' },
-      { label: 'Kết nối mạng', value: 'Wi-Fi 2.4GHz IEEE 802.11 b/g/n với ăng-ten rời' },
-      { label: 'Khoảng cách bắt sóng', value: 'Lên tới 50 mét xuyên sàn bê tông' },
-      { label: 'Kiểu lắp đặt', value: 'Gắn thanh ray DIN tủ điện hoặc ốc vít bắt tường' },
-      { label: 'Tính năng bảo vệ', value: 'Ngắt nguồn tự động khi phát hiện quá tải / xung áp' },
-      { label: 'Kích thước', value: '90 x 55 x 40 mm' },
-      { label: 'Thời gian bảo hành', value: '24 tháng 1 đổi 1 tận nơi' },
-    ],
-    features: [
-      'Bật bình nóng lạnh từ cơ quan trước khi về nhà 15 phút',
-      'Tự động ngắt điện sau 20 phút đun, không lo cháy thanh đốt bình nóng lạnh',
-      'Điều khiển bơm nước tưới tiêu nông nghiệp, phun sương hẹn giờ thông minh',
-      'Tích hợp nút nhấn vật lý dự phòng ngay trên thân thiết bị',
-    ],
-  },
-  {
-    id: 'switch-door',
-    name: 'Công Tắc Cửa Cuốn Thông Minh Hunonic Door',
-    category: 'Cửa cuốn & Rèm tự động',
-    categorySlug: 'cua-cuon-rem',
-    tag: 'Bảo Vệ Đa Lớp',
-    badge: 'Cửa Cuốn An Toàn',
-    price: 1490000,
-    originalPrice: 1713500,
-    discountPercent: 13,
-    warranty: '24 Tháng (1 Đổi 1)',
-    promotionNote: 'Tương thích 99% các loại hộp điều khiển cửa cuốn trên thị trường',
-    shortDesc: 'Mặt kính cảm ứng Lên - Dừng - Xuống, đóng/mở cửa cuốn bằng điện thoại dù ở bất cứ đâu.',
-    imageUrl: '/images/hunonic/cua-cuon-hunonic.jpg',
-    fallbackImageUrl: '/images/hunonic/cua-cuon-hunonic.jpg',
-    specs: [
-      'Điều khiển đóng/mở cửa cuốn từ xa qua 4G/Wi-Fi an toàn',
-      'Cảnh báo trạng thái cửa mở/đóng về điện thoại thời gian thực',
-      'Khóa cảm ứng bề mặt phòng trẻ em bấm nghịch cửa',
-      'Lắp vừa đế âm tường tiêu chuẩn chữ nhật 120x72mm',
-    ],
-    detailedSpecs: [
-      { label: 'Điện áp sử dụng', value: '95 – 250V AC / 50Hz' },
-      { label: 'Ngõ ra điều khiển', value: '3 rơ-le tiếp điểm khô (Lên - Dừng - Xuống)' },
-      { label: 'Khả năng tương thích', value: 'Austdoor, Bossdoor, Eurodoor, Titadoor, YH...' },
-      { label: 'Bảo mật truyền dẫn', value: 'Mã hóa chống sao chép tần số rolling code' },
-      { label: 'Kích thước', value: '120 x 72 x 32 mm (Chuẩn đế âm chữ nhật)' },
-      { label: 'Tính năng nâng cao', value: 'Khóa phím cảm ứng trên app, chia sẻ phân quyền' },
-      { label: 'Thời gian bảo hành', value: '24 tháng đổi mới chính hãng' },
-    ],
-    features: [
-      'Mở cửa cho người thân hoặc người giao hàng khi vắng nhà',
-      'Kiểm tra tình trạng cửa đã đóng kín hay chưa mọi lúc mọi nơi',
-      'Thông báo ngay lập tức khi phát hiện cửa bị cạy mở trái phép',
-      'Thiết kế kính cường lực phím bấm LED dạ quang định vị ban đêm',
-    ],
-  },
-  {
-    id: 'plug-sk01',
-    name: 'Ổ Cắm Âm Tường Hunonic SK01 4000W',
-    category: 'Ổ cắm thông minh',
-    categorySlug: 'o-cam',
-    tag: 'Đo Điện Tiêu Thụ',
-    badge: 'Mặt Kính Cường Lực',
-    price: 360000,
-    originalPrice: 500000,
-    discountPercent: 28,
-    warranty: '24 Tháng (1 Đổi 1)',
-    promotionNote: 'Mặt kính chịu nhiệt chống trầy + Đo kWh điện năng thực',
-    shortDesc: 'Chịu tải 4000W (16A), đo điện năng kWh theo ngày/tháng, chống giật an toàn cho trẻ nhỏ.',
-    imageUrl: '/images/hunonic/o-cam-sk01.jpg',
-    fallbackImageUrl: '/images/hunonic/o-cam-sk01.jpg',
-    specs: [
-      'Công suất cực đại: 4000W - 16A, màn che bảo vệ trẻ em',
-      'Đo điện năng tiêu thụ: Theo dõi công suất W, điện áp V và kWh trên App',
-      'Tự động ngắt khi phát hiện quá tải hoặc nhiệt độ ổ cắm vượt ngưỡng',
-      'Lắp đặt thay thế trực tiếp ổ cắm cũ mà không cần đục phá tường',
-    ],
-    detailedSpecs: [
-      { label: 'Công suất tải cực đại', value: '4000W - 16A (Chạy liên tục)' },
-      { label: 'Điện áp đầu vào', value: '110 – 240V AC / 50-60Hz' },
-      { label: 'Đo lường điện năng', value: 'Đo công suất W, dòng điện A, điện áp V, kWh tích lũy' },
-      { label: 'Mặt ổ cắm', value: 'Kính cường lực 2.5D cách điện 100%, nắp che an toàn' },
-      { label: 'Chuẩn cắm tương thích', value: 'Phích cắm 2 chấu tròn, dẹt, 3 chấu đa năng' },
-      { label: 'Kích thước', value: '120 x 72 x 34 mm (Đế âm chữ nhật tiêu chuẩn)' },
-      { label: 'Thời gian bảo hành', value: '24 tháng 1 đổi 1 tận nơi' },
-    ],
-    features: [
-      'Theo dõi chính xác lượng điện tiêu thụ của điều hòa, tủ lạnh, bếp từ',
-      'Tự động tắt nguồn khi sạc đầy pin xe điện, điện thoại chống chai pin',
-      'Khóa an toàn trẻ nhỏ bằng nắp che cơ học chống thò tay',
-      'Vật liệu nhựa chống cháy Polycarbonate và đồng Phosphor đàn hồi cao',
-    ],
-  },
-  {
-    id: 'plug-sk02',
-    name: 'Ổ Cắm Di Động Hunonic SK02',
-    category: 'Ổ cắm thông minh',
-    categorySlug: 'o-cam',
-    badge: 'Nhỏ Gọn Tiện Lợi',
-    price: 158000,
-    originalPrice: 250000,
-    discountPercent: 37,
-    warranty: '12 Tháng (1 Đổi 1)',
-    promotionNote: 'Mua 3 tặng 1 + Cắm dùng ngay không cần lắp đặt',
-    shortDesc: 'Cắm nối tiếp vào bất kỳ ổ điện nào trong nhà, biến quạt, ấm đun nước thành thiết bị thông minh.',
-    imageUrl: '/images/hunonic/sk02.png',
-    fallbackImageUrl: '/images/hunonic/sk02.png',
-    specs: [
-      'Công suất 2500W - 10A, cắm trực tiếp ổ tường',
-      'Hẹn giờ đếm ngược sạc điện thoại, ấm siêu tốc, quạt ngủ',
-      'Bật tắt từ xa qua 4G/Wi-Fi mọi lúc mọi nơi',
-      'Nút bấm vật lý bật/tắt nhanh có đèn LED chỉ báo trạng thái',
-    ],
-    detailedSpecs: [
-      { label: 'Công suất tối đa', value: '2500W - 10A' },
-      { label: 'Điện áp sử dụng', value: '100 – 240V AC' },
-      { label: 'Kết nối mạng', value: 'Wi-Fi 2.4GHz b/g/n trực tiếp' },
-      { label: 'Kiểu dáng', value: 'Mini cắm ngoài, vỏ nhựa ABS chống cháy' },
-      { label: 'Chân cắm', value: 'Chân tròn dẹt chuẩn cắm Việt Nam' },
-      { label: 'Thời gian bảo hành', value: '12 tháng đổi mới' },
-    ],
-    features: [
-      'Biến các thiết bị điện thường thành thiết bị thông minh trong 1 nốt nhạc',
-      'Lập lịch bật tắt máy lọc không khí, đèn trang trí bể cá cảnh',
-      'Tiết kiệm điện năng triệt để cho mọi gia đình',
-      'Thiết kế tròn tinh tế không chiếm dụng diện tích ổ cắm bên cạnh',
-    ],
-  },
-  {
-    id: 'plug-pump-guard',
-    name: 'Ổ Cắm Chống Giật Máy Bơm Hunonic Pump Guard',
-    category: 'Bơm tưới & Nông nghiệp 4G',
-    categorySlug: 'nong-nghiep-bom',
-    tag: 'Bảo Vệ Tính Mạng',
-    badge: 'Phao Điện 12V Tuyệt Đối An Toàn',
-    price: 590000,
-    originalPrice: 720000,
-    discountPercent: 18,
-    warranty: '24 Tháng (1 Đổi 1)',
-    promotionNote: 'Hạ điện áp lên phao bồn nước xuống 12V + Triệt tiêu nguy cơ rò điện',
-    shortDesc: 'Bảo vệ chống giật khi bơm nước lên bồn téc, triệt tiêu 100% điện giật nguy hiểm từ phao điện mái nhà.',
-    imageUrl: '/images/hunonic/o-cam-sps.png',
-    fallbackImageUrl: '/images/hunonic/o-cam-sps.png',
-    specs: [
-      'Công suất chịu tải: 3000W (chuyên dụng mọi máy bơm gia đình và công nghiệp nhỏ)',
-      'Hạ áp phao điện téc nước từ 220V xuống 12V nguồn một chiều DC siêu an toàn',
-      'Rơ-le Omron siêu bền bỉ, tích hợp đèn LED báo trạng thái bồn đầy/cạn',
-      'Bật/tắt và giám sát hoạt động máy bơm từ xa trên điện thoại qua Wi-Fi',
-    ],
-    detailedSpecs: [
-      { label: 'Điện áp đầu vào', value: '180V – 240V AC / 50Hz' },
-      { label: 'Điện áp lên phao', value: '12V DC (Nguồn điện an toàn tuyệt đối, không gây giật)' },
-      { label: 'Công suất tải tối đa', value: '3000W (Dùng tốt cho máy bơm tới 2.5 HP)' },
-      { label: 'Kết nối điều khiển', value: 'Wi-Fi 2.4GHz b/g/n + Công tắc gạt chế độ Auto/Man' },
-      { label: 'Đèn LED chỉ báo', value: 'Báo nguồn, Báo bơm chạy, Báo cạn nước, Báo đầy bồn' },
-      { label: 'Lắp đặt', value: 'Gắn thanh ray tủ điện hoặc bắt vít tường gần ổ cắm bơm' },
-      { label: 'Thời gian bảo hành', value: '24 tháng 1 đổi 1 chính hãng' },
-    ],
-    features: [
-      'Không còn nỗi lo rò rỉ điện 220V nguy hiểm lên téc nước mái tôn khi leo lên kiểm tra',
-      'Tự động bơm khi cạn nước và ngắt khi đầy bể theo tín hiệu phao 12V',
-      'Chế độ chống cạn: Tự ngắt bơm nếu giếng hết nước sau 15 phút, chống cháy máy bơm',
-      'Theo dõi lịch sử bơm nước và thời gian hoạt động trực tiếp trên điện thoại',
-    ],
-  },
-  {
-    id: 'breaker-notec',
-    name: 'Aptomat Thông Minh Chống Giật Hunonic Notec',
-    category: 'Aptomat & Đo Năng Lượng',
-    categorySlug: 'aptomat',
-    tag: 'Đo Điện Tủ Tổng',
-    badge: 'Chống Giật & Quá Tải',
-    price: 945000,
-    originalPrice: 1190000,
-    discountPercent: 21,
-    warranty: '24 Tháng (1 Đổi 1)',
-    promotionNote: 'Màn hình LCD đo kWh thời gian thực + Cắt điện từ xa bảo vệ gia đình',
-    shortDesc: 'Gắn tủ điện tổng hoặc từng tầng, đo lượng điện tiêu thụ toàn nhà, tự ngắt khi chạm chập quá tải.',
-    imageUrl: '/images/hunonic/aptomat-notec-real.jpg',
-    fallbackImageUrl: '/images/hunonic/notec.jpg',
-    specs: [
-      'Dòng định mức: 63A, ngắt mạch cực nhanh bảo vệ toàn bộ mạng điện',
-      'Màn hình LCD hiển thị điện áp, công suất tức thời và kWh tiêu thụ',
-      'Cảnh báo rò rỉ điện, chống giật và ngắn mạch tức thì',
-      'Bật/tắt nguồn điện tổng ngôi nhà từ xa qua điện thoại thông minh',
-    ],
-    detailedSpecs: [
-      { label: 'Dòng định mức (In)', value: 'Tùy chỉnh 1A - 63A trên ứng dụng' },
-      { label: 'Điện áp làm việc', value: '85V – 280V AC / 50-60Hz' },
-      { label: 'Dòng rò bảo vệ', value: '10mA – 100mA (Ngắt trong < 0.1 giây)' },
-      { label: 'Cấp độ bảo vệ', value: 'Quá tải, Ngắn mạch, Quá áp, Thấp áp, Dòng rò chống giật' },
-      { label: 'Màn hình hiển thị', value: 'LCD kỹ thuật số sắc nét hiển thị V, A, kW, kWh' },
-      { label: 'Lắp đặt', value: 'Thanh ray nhôm DIN-Rail tiêu chuẩn tủ điện dân dụng' },
-      { label: 'Thời gian bảo hành', value: '24 tháng 1 đổi 1 tận nơi' },
-    ],
-    features: [
-      'Biết chính xác hôm nay ngôi nhà dùng hết bao nhiêu số điện (kWh)',
-      'Tự động ngắt điện lập tức khi xảy ra chập cháy, ngăn ngừa hỏa hoạn',
-      'Cài đặt ngưỡng tiền điện trong tháng, cảnh báo khi vượt định mức',
-      'Kiểm tra hệ thống điện an toàn trước khi đi du lịch hoặc công tác xa',
-    ],
-  },
-  {
-    id: 'controller-ir',
-    name: 'Bộ Điều Khiển Hồng Ngoại Hunonic Smart IR',
-    category: 'Điều khiển & Cảm biến',
-    categorySlug: 'dieu-khien-cam-bien',
-    badge: 'Phủ Sóng 360°',
-    price: 238000,
-    originalPrice: 273700,
-    discountPercent: 13,
-    warranty: '24 Tháng (1 Đổi 1)',
-    promotionNote: 'Thư viện hơn 8.000 thiết bị + Học lệnh remote lạ',
-    shortDesc: 'Thay thế toàn bộ remote điều hòa, quạt mát, tivi trong phòng. Bật làm mát trước khi về nhà.',
-    imageUrl: '/images/hunonic/ir-icon.jpg',
-    fallbackImageUrl: '/images/hunonic/ir-icon.jpg',
-    specs: [
-      'Mắt phát hồng ngoại 360 độ bán kính 8-10m không điểm mù',
-      'Hỗ trợ 8.000+ mã điều hòa Daikin, Panasonic, Casper, LG...',
-      'Ra lệnh giọng nói: "Google, bật điều hòa phòng khách 26 độ"',
-      'Cấp nguồn cổng Type-C/Micro USB cắm liên tục cực bền',
-    ],
-    detailedSpecs: [
-      { label: 'Nguồn cấp', value: '5V DC / 1A (Cổng USB tiện dụng)' },
-      { label: 'Tần số hồng ngoại', value: '38KHz đa hướng' },
-      { label: 'Phạm vi phủ sóng', value: 'Bán kính 8 – 10m (Toàn bộ phòng 30m²)' },
-      { label: 'Kết nối mạng', value: 'Wi-Fi 2.4GHz b/g/n' },
-      { label: 'Tương thích trợ lý ảo', value: 'Google Assistant, Apple Siri tiếng Việt' },
-      { label: 'Thời gian bảo hành', value: '24 tháng đổi mới' },
-    ],
-    features: [
-      'Tự động tăng nhiệt độ điều hòa lúc 3h sáng giúp giấc ngủ sâu và êm ái',
-      'Bật sẵn điều hòa mát rượi trước khi về tới cửa 10 phút',
-      'Không còn nỗi lo thất lạc hay hết pin remote điều hòa',
-      'Học lệnh thông minh từ bất kỳ chiếc remote hồng ngoại nào',
-    ],
-  },
-  {
-    id: 'sensor-smoke',
-    name: 'Cảm Biến Báo Khói Báo Cháy Hunonic',
-    category: 'Điều khiển & Cảm biến',
-    categorySlug: 'dieu-khien-cam-bien',
-    badge: 'Báo Động 85dB',
-    price: 480000,
-    originalPrice: 580000,
-    discountPercent: 17,
-    warranty: '24 Tháng (1 Đổi 1)',
-    promotionNote: 'Tặng kèm pin lithium 2 năm + Băng keo 3M chuyên dụng',
-    shortDesc: 'Phát hiện khói sớm bằng quang điện tử, còi hú 85dB tại chỗ và đẩy tin khẩn cấp về điện thoại.',
-    imageUrl: '/images/hunonic/cam-bien-khoi-real.jpg',
-    fallbackImageUrl: '/images/hunonic/icon-cam-bien-khoi.jpg',
-    specs: [
-      'Còi hú báo động âm lượng 85dB cảnh báo cho mọi người trong nhà',
-      'Gửi thông báo đẩy khẩn cấp và gọi cảnh báo qua ứng dụng',
-      'Thời lượng pin siêu bền trên 2 năm, thông báo pin yếu trên App',
-      'Tự động liên kết ngắt Aptomat hoặc mở van tưới tự động',
-    ],
-    detailedSpecs: [
-      { label: 'Công nghệ cảm biến', value: 'Quang điện tử độ nhạy cao (Photoelectric Sensor)' },
-      { label: 'Âm lượng còi hú', value: '≥ 85dB ở khoảng cách 3 mét' },
-      { label: 'Nguồn điện', value: 'Pin Lithium chuyên dụng tuổi thọ 2-3 năm' },
-      { label: 'Phạm vi quét', value: 'Bảo vệ diện tích 20 – 40 m² trần nhà' },
-      { label: 'Thời gian bảo hành', value: '24 tháng chính hãng' },
-    ],
-    features: [
-      'Phát hiện khói âm ỉ ngay từ giai đoạn đầu trước khi bùng phát thành ngọn lửa',
-      'Báo động đồng thời cho toàn bộ các thành viên trong gia đình',
-      'Lắp đặt gắn trần đơn giản trong 1 phút bằng miếng dán 3M',
-      'Kiểm tra định kỳ trạng thái cảm biến trực tiếp trên ứng dụng',
-    ],
-  },
-  {
-    id: 'sensor-presence',
-    name: 'Cảm Biến Hiện Diện Hunonic Radar mmWave',
-    category: 'Điều khiển & Cảm biến',
-    categorySlug: 'dieu-khien-cam-bien',
-    tag: 'Công Nghệ Mới',
-    badge: 'Radar Bước Sóng Milimet',
-    price: 690000,
-    originalPrice: 820000,
-    discountPercent: 16,
-    warranty: '24 Tháng (1 Đổi 1)',
-    promotionNote: 'Không bao giờ tự tắt đèn khi đang ngồi yên làm việc hay đọc sách',
-    shortDesc: 'Phát hiện nhịp thở và vi chuyển động chính xác 100%, khắc phục nhược điểm cảm biến hồng ngoại PIR cũ.',
-    imageUrl: '/images/hunonic/hien-dien.jpg',
-    fallbackImageUrl: '/images/hunonic/hien-dien.jpg',
-    specs: [
-      'Công nghệ Radar mmWave tần số 24GHz nhận diện người ngồi tĩnh tại',
-      'Tích hợp cảm biến cường độ ánh sáng Lux để bật đèn khi trời tối',
-      'Góc quét siêu rộng 120 độ, khoảng cách quét nhạy tới 6 - 8 mét',
-      'Liên kết tự động bật/tắt đèn phòng tắm, phòng làm việc, hành lang',
-    ],
-    detailedSpecs: [
-      { label: 'Tần số radar', value: '24GHz Doppler mmWave Radar' },
-      { label: 'Khoảng cách phát hiện', value: 'Tĩnh tại: 3 - 4 mét | Chuyển động: 6 - 8 mét' },
-      { label: 'Góc nhận diện', value: '120° hình nón toàn diện' },
-      { label: 'Cảm biến quang học', value: 'Tích hợp đo cường độ ánh sáng 0 - 2000 Lux' },
-      { label: 'Nguồn cấp', value: 'Cổng Type-C 5V/1A hoặc đấu nối nguồn âm trần 220V' },
-      { label: 'Thời gian trễ giữ trạng thái', value: 'Tùy chỉnh từ 5 giây đến 60 phút trên App' },
-      { label: 'Thời gian bảo hành', value: '24 tháng 1 đổi 1 tận nơi' },
-    ],
-    features: [
-      'Ngồi yên đọc sách, làm việc trên máy tính đèn vẫn sáng liên tục mà không cần vẫy tay',
-      'Tự động tắt đèn sau khi rời khỏi phòng, tiết kiệm tối đa điện năng gia đình',
-      'Cài đặt kịch bản: Chỉ bật đèn khi phát hiện có người VÀ trời tối dưới 50 Lux',
-      'Thiết kế tròn nhỏ gọn tinh tế, gắn trần thạch cao hoặc ốp tường thẩm mỹ',
-    ],
-  },
-  {
-    id: 'smart-lock',
-    name: 'Khóa Cửa Vân Tay Thông Minh Hunonic Smart Lock',
-    category: 'Khóa cửa thông minh',
-    categorySlug: 'khoa-thong-minh',
-    tag: 'Bảo Mật Cao Cấp',
-    badge: 'Vân Tay FPC Thụy Điển',
-    price: 4850000,
-    originalPrice: 5600000,
-    discountPercent: 13,
-    warranty: '24 Tháng (1 Đổi 1)',
-    promotionNote: 'Miễn phí công lắp đặt tại nhà + Tặng 2 thẻ từ RFID và 2 chìa cơ chống sao chép',
-    shortDesc: '5 phương thức mở khóa: Vân tay sinh trắc học 0.3s, mã số ảo chống nhìn trộm, thẻ từ, chìa cơ và App.',
-    imageUrl: '/images/hunonic/khoa-cua-go-tdl68.jpg',
-    fallbackImageUrl: '/images/hunonic/khoa-den.png',
-    specs: [
-      'Cảm biến vân tay FPC Thụy Điển trên tay nắm, mở cửa chỉ 0.3s',
-      'Hợp kim kẽm nguyên khối đúc áp lực siêu cứng chống cạy phá',
-      'Cảnh báo chuông báo động khi nhập sai mật khẩu 5 lần',
-      'Tạo mã mở cửa tạm thời từ xa cho người thân, bạn bè đến chơi',
-    ],
-    detailedSpecs: [
-      { label: 'Phương thức mở khóa', value: 'Vân tay, Mã số, Thẻ từ RFID, Chìa cơ, Ứng dụng Hunonic' },
-      { label: 'Dung lượng lưu trữ', value: '100 vân tay, 100 mã số, 100 thẻ từ' },
-      { label: 'Cảm biến vân tay', value: 'Sinh trắc học bán dẫn FPC Thụy Điển (Tỉ lệ nhận diện > 99.8%)' },
-      { label: 'Độ dày cửa phù hợp', value: '38mm – 100mm (Cửa gỗ, cửa thép chống cháy, cửa nhôm Xingfa)' },
-      { label: 'Nguồn cấp dự phòng', value: '4 pin AA kiềm Alkaline (12 tháng) + Cổng kích nguồn Type-C' },
-      { label: 'Chất liệu thân khóa', value: 'Hợp kim nhôm kẽm đúc nguyên khối chống va đập' },
-      { label: 'Thời gian bảo hành', value: '24 tháng 1 đổi 1 tận nơi' },
-    ],
-    features: [
-      'Nhận diện vân tay siêu nhạy ngay cả khi tay ướt hoặc mồ hôi',
-      'Xem lịch sử ai mở cửa vào nhà theo thời gian thực trên điện thoại',
-      'Mật mã ảo chống người lạ nhìn trộm mật khẩu khi đi cùng',
-      'Chốt khóa tự động kích hoạt ngay khi cửa đóng',
-    ],
-  },
-  {
-    id: 'switch-datic',
-    name: 'Công Tắc Cảm Ứng Thông Minh Hunonic Datic',
-    category: 'Công tắc thông minh',
-    categorySlug: 'cong-tac',
-    tag: 'Giá Tiết Kiệm',
-    badge: 'Kính Cường Lực Bo Cạnh',
-    price: 298000,
-    originalPrice: 380000,
-    discountPercent: 22,
-    warranty: '24 Tháng (1 Đổi 1)',
-    promotionNote: 'Chuẩn Wi-Fi độc lập + Mặt kính cường lực chống cháy',
-    shortDesc: 'Dòng công tắc cảm ứng thông minh phổ thông, thẩm mỹ thanh lịch, giá thành tối ưu cho mọi ngôi nhà.',
-    imageUrl: '/images/hunonic/datic-basic.jpg',
-    fallbackImageUrl: '/images/hunonic/datic-basic.jpg',
-    specs: [
-      'Công suất 500W/nút tải LED, phù hợp chiếu sáng mọi căn phòng',
-      'Kết nối trực tiếp Wi-Fi 2.4GHz không cần bộ trung tâm đắt tiền',
-      'Phím cảm ứng điện dung chạm nhẹ nhàng, đèn LED định vị ban đêm',
-      'Lắp vừa vặn đế âm chữ nhật tiêu chuẩn Việt Nam',
-    ],
-    detailedSpecs: [
-      { label: 'Điện áp hoạt động', value: '95 – 250V AC / 50Hz' },
-      { label: 'Công suất chịu tải', value: '500W / kênh LED (Tổng tối đa 2000W)' },
-      { label: 'Kết nối mạng', value: 'Wi-Fi 2.4GHz b/g/n' },
-      { label: 'Bề mặt hoàn thiện', value: 'Mặt kính cường lực bo viền tinh tế' },
-      { label: 'Kích thước chuẩn', value: '120 x 72 x 32 mm (Đế âm chữ nhật)' },
-      { label: 'Thời gian bảo hành', value: '24 tháng đổi mới chính hãng' },
-    ],
-    features: [
-      'Điều khiển bật/tắt từ xa qua mạng 3G/4G/Wi-Fi không giới hạn khoảng cách',
-      'Hẹn giờ tự động bật tắt đèn sân vườn, đèn ban công mỗi ngày',
-      'Tạo ngữ cảnh thông minh: Về nhà tự bật đèn, Đi ngủ tắt hết đèn',
-      'Chia sẻ quyền quản lý cho tất cả các thành viên trong gia đình',
-    ],
-    options: {
-      gangs: [1, 2, 3, 4],
-      shapes: [
-        { id: 'rectangular', name: 'Đế chữ nhật (Sino, Panasonic tiêu chuẩn)', dimension: '120 x 72 x 32 mm' },
-      ],
-      colors: [
-        { id: 'black', name: 'Đen Huyền Bí', hex: '#1E293B' },
-        { id: 'white', name: 'Trắng Thanh Lịch', hex: '#F8FAFC' },
-      ],
-    },
-  },
-  {
-    id: 'camera-icat',
-    name: 'Camera Thông Minh Trong Nhà Hunonic iCat Mini',
-    category: 'Camera Giám Sát',
-    categorySlug: 'camera-an-ninh',
-    tag: 'Góc Rộng 360°',
-    badge: 'Đàm Thoại 2 Chiều',
-    price: 799000,
-    originalPrice: 918850,
-    discountPercent: 13,
-    warranty: '24 Tháng (1 Đổi 1)',
-    promotionNote: 'Hình ảnh Full HD sắc nét + Tự động bám đuổi chuyển động',
-    shortDesc: 'Xoay 360 độ quan sát toàn cảnh, đàm thoại 2 chiều to rõ, tích hợp sâu vào hệ sinh thái nhà Hunonic.',
-    imageUrl: '/images/hunonic/icat.jpg',
-    fallbackImageUrl: '/images/hunonic/icat.jpg',
-    specs: [
-      'Độ phân giải Full HD sắc nét, quay quét ngang 355° dọc 90°',
-      'Hồng ngoại quay đêm rõ nét phạm vi 10 mét',
-      'Đàm thoại 2 chiều loa to rõ ràng qua micro tích hợp',
-      'Gửi video và thông báo tức thời khi phát hiện có chuyển động lạ',
-    ],
-    detailedSpecs: [
-      { label: 'Độ phân giải', value: 'Full HD 1080P sắc nét mượt mà' },
-      { label: 'Góc quan sát', value: 'Xoay ngang 355°, xoay dọc 90°' },
-      { label: 'Giao tiếp âm thanh', value: 'Đàm thoại 2 chiều hai chiều tích hợp loa & mic' },
-      { label: 'Lưu trữ video', value: 'Thẻ nhớ MicroSD tối đa 128GB hoặc Cloud Server Việt Nam' },
-      { label: 'Tầm nhìn ban đêm', value: 'Hồng ngoại thông minh Smart IR 10m' },
-      { label: 'Thời gian bảo hành', value: '24 tháng 1 đổi 1 tận nơi' },
-    ],
-    features: [
-      'Tự động theo dõi đối tượng di chuyển trong khung hình',
-      'Xem trực tiếp hình ảnh camera ngay trên ứng dụng điều khiển Hunonic',
-      'Liên kết thông minh: Bật đèn khi camera phát hiện người bước vào',
-      'Chế độ riêng tư tự giấu mắt camera khi gia chủ ở nhà',
-    ],
-  },
-];
+export const checkMatchesCategory = (p: Product, catId: string): boolean => {
+  if (catId === 'tat-ca') return true;
+  const name = p.name.toLowerCase();
+  const slug = (p.categorySlug || '').toLowerCase();
+  const desc = (p.shortDesc || '').toLowerCase();
 
-export const PRODUCTS_DATA: Product[] = [
-  ...INITIAL_FEATURED_PRODUCTS,
-  ...PRODUCTS_95,
-].sort((a, b) => b.price - a.price);
+  if (catId === 'cong-tac-thong-minh') {
+    return (
+      slug === 'cong-tac' ||
+      name.includes('công tắc') ||
+      name.includes('datic') ||
+      name.includes('đui đèn') ||
+      name.includes('door') ||
+      name.includes('neo')
+    );
+  }
+  if (catId === 'cong-tac-cam-ung') {
+    return (
+      name.includes('cảm ứng') ||
+      name.includes('datic') ||
+      name.includes('csl') ||
+      name.includes('door') ||
+      name.includes('neo')
+    );
+  }
+  if (catId === 'thiet-bi-an-ninh') {
+    return (
+      slug === 'khoa-thong-minh' ||
+      name.includes('khóa') ||
+      name.includes('tadolock') ||
+      name.includes('chuông') ||
+      name.includes('door sensor') ||
+      name.includes('cảm biến cửa')
+    );
+  }
+  if (catId === 'thiet-bi-an-toan-dien') {
+    return (
+      slug === 'aptomat' ||
+      slug === 'an-toan-dien' ||
+      name.includes('công tơ') ||
+      name.includes('entec') ||
+      name.includes('chống giật') ||
+      name.includes('csl') ||
+      desc.includes('chống giật')
+    );
+  }
+  if (catId === 'cam-bien-thong-minh') {
+    return (
+      name.includes('cảm biến') ||
+      name.includes('sensor') ||
+      name.includes('hpr') ||
+      name.includes('pir')
+    );
+  }
+  if (catId === 'bo-dieu-khien-trung-tam') {
+    return (
+      name.includes('ir smart') ||
+      name.includes('hồng ngoại') ||
+      name.includes('chuông') ||
+      name.includes('neo r6') ||
+      name.includes('ngữ cảnh') ||
+      name.includes('đui đèn') ||
+      name.includes('door') ||
+      name.includes('cửa cuốn') ||
+      slug.includes('cua-cuon')
+    );
+  }
+  return slug === catId;
+};
+
+// Exactly 26 products requested by user from Hunonic catalog
+export const PRODUCTS_DATA: Product[] = HUNONIC_26_PRODUCTS;
 
 export const COMBOS_DATA: ComboPackage[] = [
   {
@@ -582,8 +100,8 @@ export const COMBOS_DATA: ComboPackage[] = [
     discountText: 'TIẾT KIỆM 610.000đ + TẶNG SƠ ĐỒ LẮP ĐẶT',
     highlightBenefit: 'Phù hợp nâng cấp phòng ngủ hoặc phòng khách nhỏ',
     items: [
-      '2 Công tắc cảm ứng thông minh Hunonic Luxury',
-      '1 Ổ cắm thông minh chống cháy SK01 4000W',
+      '2 Công tắc cảm ứng thông minh Hunonic WiFi',
+      '1 Bộ điều khiển hồng ngoại IR Smart',
       'Tặng tài liệu hướng dẫn lắp đặt chuẩn kỹ thuật',
       'Miễn phí tài khoản Cloud máy chủ trọn đời',
     ],
@@ -597,11 +115,11 @@ export const COMBOS_DATA: ComboPackage[] = [
     originalPrice: 3458000,
     price: 2580000,
     discountText: 'TIẾT KIỆM 878.000đ + FREESHIP TOÀN QUỐC',
-    highlightBenefit: 'Đầy đủ công tắc, ổ cắm & điều khiển IR cho nhà 2-3 phòng',
+    highlightBenefit: 'Đầy đủ công tắc cảm ứng, bộ hồng ngoại và cảm biến an ninh',
     items: [
-      '3 Công tắc cảm ứng thông minh Hunonic Luxury (tùy chọn nút)',
-      '1 Ổ cắm công suất lớn SK01 4000W cho bình nóng lạnh',
-      '1 Bộ điều khiển hồng ngoại IR Smart 360° cho điều hòa/TV',
+      '3 Công tắc cảm ứng thông minh Hunonic (tùy chọn nút)',
+      '1 Cảm biến hiện diện Hunonic HPr hoặc cảm biến cửa',
+      '1 Bộ điều khiển hồng ngoại IR Smart Pro 360°',
       'Miễn phí giao hàng COD toàn quốc',
       'Bảo hành 24 tháng 1 đổi 1 tận nơi',
     ],
@@ -666,7 +184,7 @@ export const COMPARISON_ROWS: ComparisonRow[] = [
   },
   {
     criteria: 'Giá thành đầu tư',
-    hunonicValue: '✅ Giá gốc trực tiếp nhà máy (Chỉ từ 225k)',
+    hunonicValue: '✅ Giá tốt nhất thị trường',
     hunonicStatus: 'highlight',
     competitorValue: 'Đắt gấp 2.5 – 4 lần qua nhiều tầng trung gian',
     competitorStatus: 'warning',
@@ -714,9 +232,9 @@ export const TESTIMONIALS: Testimonial[] = [
     avatarLetter: 'T',
     avatarBg: 'bg-primary text-white',
     location: 'TP. Hải Dương',
-    purchasedItems: 'Đã lắp 6 công tắc & 4 ổ cắm SK01',
+    purchasedItems: 'Đã lắp 6 công tắc cảm ứng Hunonic',
     quote:
-      'Lắp đặt dễ hơn tôi nghĩ rất nhiều, tự tháo công tắc cũ rồi gắn công tắc Hunonic Luxury chỉ mất chừng 5 phút mỗi cái. Ứng dụng tiếng Việt mượt mà, không thu đồng phí tháng nào. Tháng vừa rồi tiền điện nhà tôi giảm gần 20% nhờ tính năng hẹn giờ bình nóng lạnh và đèn sân.',
+      'Lắp đặt dễ hơn tôi nghĩ rất nhiều, tự tháo công tắc cũ rồi gắn công tắc Hunonic chỉ mất chừng 5 phút mỗi cái. Ứng dụng tiếng Việt mượt mà, không thu đồng phí tháng nào. Tháng vừa rồi tiền điện nhà tôi giảm gần 20% nhờ tính năng hẹn giờ bình nóng lạnh và đèn sân.',
     rating: 5,
     verified: true,
   },
@@ -736,9 +254,9 @@ export const TESTIMONIALS: Testimonial[] = [
 
 export const RECENT_ORDERS_TOAST: RecentOrderToastItem[] = [
   { name: 'Anh Lực', location: 'Việt Hòa, Hải Phòng', packageName: 'Bộ Điều Khiển Hồng Ngoại IR', timeAgo: 'Vừa xong' },
-  { name: 'Anh Nam', location: 'Hải Châu, Đà Nẵng', packageName: 'Bộ 5 Công Tắc Cảm Ứng Luxury', timeAgo: '2 phút trước' },
-  { name: 'Chị Thảo', location: 'Quận 1, TP.HCM', packageName: '4 Công Tắc Cảm Ứng Luxury', timeAgo: '3 phút trước' },
-  { name: 'Anh Hoàng', location: 'Đống Đa, Hà Nội', packageName: '2 Ổ Cắm SK01 + 1 Bộ IR', timeAgo: '5 phút trước' },
-  { name: 'Anh Dũng', location: 'Hồng Bàng, Hải Phòng', packageName: '1 Cảm Biến Khói + 2 Công Tắc', timeAgo: '7 phút trước' },
-  { name: 'Chị Mai', location: 'Ninh Kiều, Cần Thơ', packageName: 'Combo 5 Thiết Bị Toàn Diện', timeAgo: '9 phút trước' },
+  { name: 'Anh Nam', location: 'Hải Châu, Đà Nẵng', packageName: 'Công tắc cảm ứng WiFi Hunonic', timeAgo: '2 phút trước' },
+  { name: 'Chị Thảo', location: 'Quận 1, TP.HCM', packageName: 'Công tắc cảm ứng Hunonic Datic', timeAgo: '3 phút trước' },
+  { name: 'Anh Hoàng', location: 'Đống Đa, Hà Nội', packageName: 'Công tơ điện HUNONIC ENTEC', timeAgo: '5 phút trước' },
+  { name: 'Anh Dũng', location: 'Hồng Bàng, Hải Phòng', packageName: 'Cảm Biến Hiện Diện HPr Âm Trần', timeAgo: '7 phút trước' },
+  { name: 'Chị Mai', location: 'Ninh Kiều, Cần Thơ', packageName: 'Khóa Thông Minh TADOLock TDL 21', timeAgo: '9 phút trước' },
 ];

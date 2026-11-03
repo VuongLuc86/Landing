@@ -1,5 +1,5 @@
 import React from 'react';
-import { COMMITMENTS, TESTIMONIALS } from '../data/mockData';
+import { TESTIMONIALS } from '../data/mockData';
 
 export const ReviewsAndCommitments: React.FC = () => {
   return (
@@ -27,23 +27,7 @@ export const ReviewsAndCommitments: React.FC = () => {
           </p>
         </div>
 
-        {/* 5 Golden Commitments Bento Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {COMMITMENTS.map((item, idx) => (
-            <div
-              key={idx}
-              className="p-5 rounded-2xl bg-[#f2f4f6] flex flex-col gap-3 hover:-translate-y-1 transition-transform border border-slate-200"
-            >
-              <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center ${item.accentColor}`}
-              >
-                <span className="material-symbols-outlined text-[22px]">{item.icon}</span>
-              </div>
-              <span className="text-sm font-bold text-slate-900">{item.title}</span>
-              <span className="text-xs text-slate-600 leading-relaxed">{item.desc}</span>
-            </div>
-          ))}
-        </div>
+
 
         {/* 2 Real Testimonials */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

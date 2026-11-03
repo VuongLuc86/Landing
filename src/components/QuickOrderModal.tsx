@@ -29,7 +29,7 @@ export const QuickOrderModal: React.FC<QuickOrderModalProps> = ({
   onViewOrdersFile,
 }) => {
   // Available selectable items (both products and combos)
-  const [selectedItemId, setSelectedItemId] = useState<string>('switch-luxury');
+  const [selectedItemId, setSelectedItemId] = useState<string>('hnn-wifi-sq-1n');
   const [quantity, setQuantity] = useState<number>(1);
   const [selectedGangs, setSelectedGangs] = useState<number>(4);
   const [selectedShape, setSelectedShape] = useState<string>('Chữ nhật (120x72mm)');

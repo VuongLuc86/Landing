@@ -49,19 +49,18 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (e) {
       console.warn('Error reading cart from localStorage', e);
     }
-    // Default initial item if cart was empty so user sees realistic cart immediately
     return [
       {
-        id: 'switch-luxury-rect-4-black',
-        productId: 'switch-luxury',
-        name: 'Công Tắc Cảm Ứng Hunonic Luxury',
-        category: 'Công tắc thông minh',
-        price: 730000,
-        originalPrice: 895000,
+        id: 'hnn-wifi-sq-1n-init',
+        productId: 'hnn-wifi-sq-1n',
+        name: 'Công tắc cảm ứng WiFi Hunonic 1 Nút, HV Đen/Trắng',
+        category: 'Công Tắc Cảm Ứng',
+        price: 875000,
+        originalPrice: 1000000,
         imageUrl: '/images/hunonic/hunonic-cam-ung.jpg',
-        shape: 'Đế Chữ nhật',
-        gangs: 4,
-        color: 'Đen Huyền Bí',
+        shape: 'Đế Vuông (HV)',
+        gangs: 1,
+        color: 'Đen / Trắng',
         quantity: 1,
         warranty: '24 Tháng (1 Đổi 1)',
       },
